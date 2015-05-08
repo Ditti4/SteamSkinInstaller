@@ -20,26 +20,10 @@ namespace SteamSkinInstaller {
     /// Interaction logic for NotAdminDialog.xaml
     /// </summary>
     public partial class NotAdminDialog : Window {
-        [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct SHSTOCKICONINFO {
-            public uint Size;
-            public IntPtr Handle;
-            public int IconIndex;
-            public int PathIndex;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string ResourcePath;
-        }
-
-        [DllImport("Shell32.dll")]
-        public static extern int SHGetStockIconInfo(int siid, int uFlags, ref SHSTOCKICONINFO psii);
 
         public NotAdminDialog() {
             InitializeComponent();
-
-            SHSTOCKICONINFO sii = new SHSTOCKICONINFO {Size = (uint) Marshal.SizeOf(typeof (SHSTOCKICONINFO))};
-            Marshal.ThrowExceptionForHR(SHGetStockIconInfo(77, 0x000000100, ref sii));
-            ShieldIcon.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(sii.Handle, Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
+            ShieldIcon.Source = MiscTools.GetUACShieldIcon();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {

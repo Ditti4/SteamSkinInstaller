@@ -14,8 +14,8 @@ namespace SteamSkinInstaller {
 
         public SteamClientProperties() {
             _installPath =
-                Microsoft.Win32.Registry.GetValue(
-                @"HKEY_LOCAL_MACHINE\SOFTWARE\" + ((Environment.Is64BitOperatingSystem) ? "Wow6432Node" : "") + @"\Valve\Steam", "InstallPath", Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)) as string;
+                Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\" + ((Environment.Is64BitOperatingSystem) ? "Wow6432Node" : "") + @"\Valve\Steam",
+                    "InstallPath", Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)) as string;
             _exePath = Path.Combine(_installPath, "Steam.exe");
             if (!File.Exists(_exePath)) {
                 _installPath = null;

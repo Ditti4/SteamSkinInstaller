@@ -29,10 +29,11 @@ namespace SteamSkinInstaller {
             if(_request == null) throw new DirectDownloadException("Couldn't create the HTTP request");
             _response = _request.GetResponse() as HttpWebResponse;
             if(_response == null) throw new DirectDownloadException("Couldn't get a response from the HTTP request");
-            if(_response.StatusCode != HttpStatusCode.OK) throw new DirectDownloadException("HTTP request returned a status code not equal to 200:" + _response.StatusDescription);
+            if (_response.StatusCode != HttpStatusCode.OK)
+                throw new DirectDownloadException("HTTP request returned a status code not equal to 200:" + _response.StatusDescription);
             _respoStream = _response.GetResponseStream();
             if (!Directory.Exists("DownloadData")) Directory.CreateDirectory("DownloadData");
-            if(File.Exists(filename) && !overwrite) throw new Exception(filename + "already exists and the overwrite parameter wasn't set to true");
+            if (File.Exists(filename) && !overwrite) throw new Exception(filename + "already exists and the overwrite parameter wasn't set to true");
             _fileStream = File.Create("DownloadData\\" + filename);
             _respoStream.CopyTo(_fileStream);
             _fileStream.Close();
