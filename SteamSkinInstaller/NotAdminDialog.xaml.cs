@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using System.Windows.Controls;
 
 namespace SteamSkinInstaller {
     /// <summary>
@@ -27,7 +27,9 @@ namespace SteamSkinInstaller {
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
-            DialogResult = Equals(sender as Button, ButtonRestart);
+            if (!(sender is Button))
+                return;
+            DialogResult = Equals((Button) sender, ButtonRestart);
         }
     }
 }

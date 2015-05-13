@@ -15,21 +15,33 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SteamSkinInstaller.DownloadHandler;
 
 namespace SteamSkinInstaller {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
-        private readonly bool _isAdmin;
+    public partial class MainWindow {
+        private bool _isAdmin;
+        private bool _adminStatusRead;
         private readonly SteamClientProperties _steamClient;
+        private WindowsPrincipal _principal;
+
         [DllImport("shell32.dll")]
         public static extern bool IsUserAnAdmin();
 
+        public bool IsAdmin() {
+            _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            if (!_adminStatusRead) {
+                _isAdmin = _principal.IsInRole(WindowsBuiltInRole.Administrator);
+                _adminStatusRead = true;
+            }
+            return _isAdmin;
+        }
+
         public MainWindow() {
             InitializeComponent();
-            _isAdmin = IsUserAnAdmin();
-            if (!_isAdmin && System.Environment.OSVersion.Version.Major >= 6) {
+            if (System.Environment.OSVersion.Version.Major >= 6 && ! IsAdmin()) {
                 NotAdminDialog notAdminDialog = new NotAdminDialog();
                 notAdminDialog.ShowDialog();
                 if(notAdminDialog.DialogResult.HasValue && notAdminDialog.DialogResult.Value) {
@@ -43,18 +55,73 @@ namespace SteamSkinInstaller {
                     } catch (Exception) {
                         // user just said "no" to the UAC request so we're falling back to non-elevated mode
                     }
-                } else
-                    Testlabel.Content = "continue";
+                }
             }
-            Testlabel.Content = "I am" + (_isAdmin ? " " : " not ") + "an admin";
 
             _steamClient = new SteamClientProperties();
-
             TextSteamLocation.Text = _steamClient.GetInstallPath();
         }
 
-        private void buttonSteamLocation_Click(object sender, RoutedEventArgs e) {
+        private void ButtonSteamLocation_Click(object sender, RoutedEventArgs e) {
             if(_isAdmin) { }
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            ButtonRefresh.Visibility = Equals((sender as TabControl).SelectedItem, TabSettings) ? Visibility.Hidden : Visibility.Visible;
+        }
+
+        private async void ButtonRefresh_Click(object sender, RoutedEventArgs e) {
+            // TODO: get newest version of XML skin list file from the GitHub repo
+        }
+
+        private StackPanel GetNewAvailableSkinFragment(string name, string author, string description, string wobsite) {
+            StackPanel outerSkinPanel = new StackPanel();
+            Label skinNameLabel = new Label();
+            Label skinAuthorLabel = new Label();
+            StackPanel buttonPanel = new StackPanel();
+            Button installButton = new Button();
+            DockPanel innerSkinPanel = new DockPanel();
+            TextBlock skinDescTextBlock = new TextBlock();
+            Button wobsiteButton = new Button();
+
+            skinNameLabel.Content = name;
+            skinNameLabel.Padding = new Thickness(0, 10, 0, 0);
+            skinNameLabel.FontSize = 20;
+
+            skinAuthorLabel.Content = "by " + author;
+            skinAuthorLabel.Padding = new Thickness(0);
+            outerSkinPanel.Orientation = Orientation.Vertical;
+
+            skinDescTextBlock.Text = description;
+            skinDescTextBlock.TextWrapping = TextWrapping.Wrap;
+            skinDescTextBlock.Margin = new Thickness(10);
+
+            installButton.Content = "Install";
+            installButton.Style = FindResource("KewlButton") as Style;
+            installButton.Margin = new Thickness(5);
+            wobsiteButton.Content = "Visit website";
+            wobsiteButton.Style = FindResource("KewlButton") as Style;
+            wobsiteButton.Margin = new Thickness(5);
+            wobsiteButton.Click += delegate {
+                Process.Start(wobsite);
+            };
+            wobsiteButton.ToolTip = "Click here to see screenshots and more!";
+            buttonPanel.Orientation = Orientation.Vertical;
+
+            buttonPanel.Children.Add(installButton);
+            buttonPanel.Children.Add(wobsiteButton);
+
+            DockPanel.SetDock(skinDescTextBlock, Dock.Left);
+            DockPanel.SetDock(buttonPanel, Dock.Right);
+
+            innerSkinPanel.Children.Add(buttonPanel);
+            innerSkinPanel.Children.Add(skinDescTextBlock);
+
+            outerSkinPanel.Children.Add(skinNameLabel);
+            outerSkinPanel.Children.Add(skinAuthorLabel);
+            outerSkinPanel.Children.Add(innerSkinPanel);
+
+            return outerSkinPanel;
         }
     }
 }

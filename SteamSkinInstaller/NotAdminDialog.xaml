@@ -1,7 +1,7 @@
 ﻿<Window x:Class="SteamSkinInstaller.NotAdminDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Running in unelevated mode" Height="320" Width="340" ResizeMode="NoResize">
+        Title="Running in unelevated mode" Height="320" Width="340" ResizeMode="NoResize" Icon="icon.ico">
     <Window.Resources>
         <ResourceDictionary Source="KewlResources.xaml"/>
     </Window.Resources>
@@ -10,8 +10,8 @@
         <TextBlock HorizontalAlignment="Left" Margin="20,79,10,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="1. You're still runing Windows XP (please upgrade)"/><LineBreak/><Run Text="2. You installed Steam in some folder other than"/><LineBreak/><Run Text="C:\Program files and only want to install skins"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" Margin="10,132,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="In any of both cases just click &quot;Continue as normal user&quot;. If you want to do any of the following though, please restart the Steam Skin Installer in elevated mode:"/></TextBlock>
         <TextBlock HorizontalAlignment="Left" Margin="20,185,10,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="1."/><Run Text=" Install skin's required fonts"/><LineBreak/><Run Text="2. Restart Steam after "/><Run Text="changing your skin"/><LineBreak/><Run Text="3. Change the skin using the installer"/></TextBlock>
-        <Button Name="ButtonContinue" Content="Continue as normal user" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="140" Style="{DynamicResource KewlButton}" Click="Button_Click" IsCancel="True"/>
-        <Button Name="ButtonRestart" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="160" Style="{DynamicResource KewlButton}" Click="Button_Click" IsDefault="True">
+        <Button Name="ButtonContinue" Content="Continue as normal user" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="140" Click="Button_Click" IsCancel="True"/>
+        <Button Name="ButtonRestart" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="160" Click="Button_Click" IsDefault="True">
             <StackPanel Width="160" Orientation="Horizontal">
                 <Image Height="16" Width="16" Name="ShieldIcon" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <TextBlock Margin="1,0">Restart in elevated mode</TextBlock>
