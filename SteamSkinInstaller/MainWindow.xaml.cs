@@ -27,9 +27,6 @@ namespace SteamSkinInstaller {
         private readonly SteamClientProperties _steamClient;
         private WindowsPrincipal _principal;
 
-        [DllImport("shell32.dll")]
-        public static extern bool IsUserAnAdmin();
-
         public bool IsAdmin() {
             _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent());
             if (!_adminStatusRead) {
@@ -41,6 +38,8 @@ namespace SteamSkinInstaller {
 
         public MainWindow() {
             InitializeComponent();
+            Left = (System.Windows.SystemParameters.PrimaryScreenWidth/2) - (Width/2);
+            Top = (System.Windows.SystemParameters.PrimaryScreenHeight/2) - (Height/2);
             if (System.Environment.OSVersion.Version.Major >= 6 && ! IsAdmin()) {
                 NotAdminDialog notAdminDialog = new NotAdminDialog();
                 notAdminDialog.ShowDialog();
@@ -58,6 +57,7 @@ namespace SteamSkinInstaller {
                 }
             }
 
+            LabelStatus.Content = "Ready.";
             _steamClient = new SteamClientProperties();
             TextSteamLocation.Text = _steamClient.GetInstallPath();
         }

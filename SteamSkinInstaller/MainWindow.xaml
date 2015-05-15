@@ -29,5 +29,8 @@
             </TabItem>
         </TabControl>
         <Button Name="ButtonRefresh" Content="Refresh list" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Style="{DynamicResource KewlButton}" Click="ButtonRefresh_Click"/>
+        <StatusBar HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="24" Padding="0">
+            <Label Name="LabelStatus" HorizontalAlignment="Stretch" Padding="0"/>
+        </StatusBar>
     </Grid>
 </Window>

@@ -23,13 +23,13 @@ namespace SteamSkinInstaller {
 
         public NotAdminDialog() {
             InitializeComponent();
+            Left = (System.Windows.SystemParameters.PrimaryScreenWidth / 2) - (Width / 2);
+            Top = (System.Windows.SystemParameters.PrimaryScreenHeight / 2) - (Height / 2);
             ShieldIcon.Source = MiscTools.GetUACShieldIcon();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) {
-            if (!(sender is Button))
-                return;
-            DialogResult = Equals((Button) sender, ButtonRestart);
+            DialogResult = Equals(sender as Button, ButtonRestart);
         }
     }
 }
