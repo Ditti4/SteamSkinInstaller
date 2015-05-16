@@ -22,18 +22,12 @@ namespace SteamSkinInstaller {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow {
-        private bool _isAdmin;
-        private bool _adminStatusRead;
-        private readonly SteamClientProperties _steamClient;
+        private SteamClientProperties _steamClient;
         private WindowsPrincipal _principal;
 
         public bool IsAdmin() {
             _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent());
-            if (!_adminStatusRead) {
-                _isAdmin = _principal.IsInRole(WindowsBuiltInRole.Administrator);
-                _adminStatusRead = true;
-            }
-            return _isAdmin;
+            return _principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
         public MainWindow() {
@@ -44,12 +38,12 @@ namespace SteamSkinInstaller {
                 NotAdminDialog notAdminDialog = new NotAdminDialog();
                 notAdminDialog.ShowDialog();
                 if(notAdminDialog.DialogResult.HasValue && notAdminDialog.DialogResult.Value) {
-                    ProcessStartInfo restartProgram = new ProcessStartInfo {
+                    ProcessStartInfo restartProgramInfo = new ProcessStartInfo {
                         FileName = System.Reflection.Assembly.GetEntryAssembly().CodeBase,
                         Verb = "runas"
                     };
                     try {
-                        Process.Start(restartProgram);
+                        Process.Start(restartProgramInfo);
                         Close();
                     } catch (Exception) {
                         // user just said "no" to the UAC request so we're falling back to non-elevated mode
@@ -63,7 +57,19 @@ namespace SteamSkinInstaller {
         }
 
         private void ButtonSteamLocation_Click(object sender, RoutedEventArgs e) {
-            if(_isAdmin) { }
+            //TODO: Create a custom version of the folder browser dialog so I don't need to mix Windows Forms and WPF
+            System.Windows.Forms.FolderBrowserDialog steamFolder = new System.Windows.Forms.FolderBrowserDialog {
+                SelectedPath = TextSteamLocation.Text,
+                ShowNewFolderButton = false
+            };
+            if (steamFolder.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+            try {
+                SteamClientProperties newClient = new SteamClientProperties(steamFolder.SelectedPath);
+                _steamClient = newClient;
+                TextSteamLocation.Text = _steamClient.GetInstallPath();
+            } catch (Exception exc) {
+                MessageBox.Show(exc.Message, "Error");
+            }
         }
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {

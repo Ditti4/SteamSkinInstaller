@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
+using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -29,7 +30,7 @@ namespace SteamSkinInstaller {
         public static extern int SHGetStockIconInfo(int siid, int uFlags, ref SHSTOCKICONINFO psii);
 
         public static BitmapSource GetUACShieldIcon() {
-            MiscTools.SHSTOCKICONINFO shieldIconInfo = new MiscTools.SHSTOCKICONINFO {Size = (uint) Marshal.SizeOf(typeof (MiscTools.SHSTOCKICONINFO))};
+            SHSTOCKICONINFO shieldIconInfo = new SHSTOCKICONINFO {Size = (uint) Marshal.SizeOf(typeof (SHSTOCKICONINFO))};
             Marshal.ThrowExceptionForHR(SHGetStockIconInfo(77, 0x000000100, ref shieldIconInfo));
             return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(shieldIconInfo.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
@@ -55,6 +56,26 @@ namespace SteamSkinInstaller {
 
         public static bool RegisterFont(string fontname, string fontfilename) {
             return true;
+        }
+
+        public static bool IsComputerConnected() {
+            if (!NetworkInterface.GetIsNetworkAvailable())
+                return false;
+            return
+                NetworkInterface.GetAllNetworkInterfaces()
+                    .Any(
+                        intf =>
+                            intf.OperationalStatus == OperationalStatus.Up && !intf.Name.ToLower().Contains("virtual") &&
+                            !intf.Description.ToLower().Contains("virtual") && !intf.Name.ToLower().Contains("loopback") &&
+                            !intf.Description.ToLower().Contains("loopback") && intf.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                            intf.NetworkInterfaceType != NetworkInterfaceType.Tunnel);
+        }
+
+        public static bool IsComputerOnline() {
+            if (!IsComputerConnected())
+                return false;
+            BetterWebClient ncsiClient = new BetterWebClient();
+            return ncsiClient.DownloadString(new Uri("http://www.msftncsi.com/ncsi.txt")).Equals("Microsoft NCSI");
         }
     }
 }

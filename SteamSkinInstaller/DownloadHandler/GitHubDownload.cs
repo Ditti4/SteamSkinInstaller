@@ -12,7 +12,7 @@ namespace SteamSkinInstaller.DownloadHandler {
         private readonly string _user;
         private readonly string _repo;
         private readonly string _filename;
-        private bool _overwrite;
+        private readonly bool _overwrite;
         private const string GithubAPIBaseURL = "https://api.github.com/repos/";
         private const string GithubBaseURL = "https://github.com/";
 
@@ -31,15 +31,6 @@ namespace SteamSkinInstaller.DownloadHandler {
                 Directory.CreateDirectory("Downloads");
             if (!File.Exists(_filename) || _overwrite)
                 downloadClient.DownloadFile(GithubBaseURL + _user + "/" + _repo + "/archive/master.zip", Path.Combine("Downloads", _filename));
-        }
-        
-        public Task GetMasterZipAsync() {
-            BetterWebClient downloadClient = new BetterWebClient();
-            if (!Directory.Exists("Downloads"))
-                Directory.CreateDirectory("Downloads");
-            if (!File.Exists(_filename) || _overwrite)
-                return downloadClient.DownloadFileTaskAsync(GithubBaseURL + _user + "/" + _repo + "/archive/master.zip", Path.Combine("Downloads", _filename));
-            else return null;
         }
 
         public string GetLatestCommitHash() {

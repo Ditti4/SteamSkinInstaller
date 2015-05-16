@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<skins xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="skins.xsd">
+  <skin>
+    <name>Metro for Steam</name>
+    <author>BoneyardBrew</author>
+    <description></description>
+    <website>http://metroforsteam.com</website>
+    <download>
+      <method>deviantart</method>
+      <devianturl>http://boneyardbrew.deviantart.com/art/Metro-for-Steam-3-9-1-292419787</devianturl>
+    </download>
+    <version>
+      <pattern>Metro for Steam - ((\d\.)*)</pattern>
+      <patterngroup>2</patterngroup>
+    </version>
+  </skin>
+</skins>
