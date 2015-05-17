@@ -29,13 +29,12 @@ namespace SteamSkinInstaller.DownloadHandler {
             BetterWebClient downloadClient = new BetterWebClient();
             if (!Directory.Exists("Downloads"))
                 Directory.CreateDirectory("Downloads");
-            if (!File.Exists(_filename) || _overwrite)
+            if (!File.Exists(Path.Combine("Downloads", _filename)) || _overwrite)
                 downloadClient.DownloadFile(GithubBaseURL + _user + "/" + _repo + "/archive/master.zip", Path.Combine("Downloads", _filename));
         }
 
         public string GetLatestCommitHash() {
-            const string regexPattern = "\"sha\": \"([0-9a-f]{40})\",";
-            Regex shaRegex = new Regex(regexPattern);
+            Regex shaRegex = new Regex("\"sha\": \"([0-9a-f]{40})\",");
             BetterWebClient apiClient = new BetterWebClient();
             string apiResponse =
                 apiClient.DownloadString(GithubAPIBaseURL + _user + "/" + _repo + "/git/refs/heads/master");

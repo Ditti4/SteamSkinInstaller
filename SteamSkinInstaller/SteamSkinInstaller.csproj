@@ -78,6 +78,7 @@
     <Compile Include="DownloadHandler\BetterWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DownloadHandler\DeviantArtDownload.cs" />
     <Compile Include="DownloadHandler\GitHubDownload.cs" />
     <Compile Include="MiscTools.cs" />
     <Compile Include="NotAdminDialog.xaml.cs">
@@ -159,7 +160,9 @@
     <Resource Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="skins.xml" />
+    <Resource Include="skins.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

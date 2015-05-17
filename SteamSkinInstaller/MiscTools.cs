@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using SteamSkinInstaller.DownloadHandler;
 
 
 namespace SteamSkinInstaller {

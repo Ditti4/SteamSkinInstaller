@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
@@ -24,6 +25,7 @@ namespace SteamSkinInstaller {
     public partial class MainWindow {
         private SteamClientProperties _steamClient;
         private WindowsPrincipal _principal;
+        private bool _online;
 
         public bool IsAdmin() {
             _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent());
@@ -51,9 +53,21 @@ namespace SteamSkinInstaller {
                 }
             }
 
-            LabelStatus.Content = "Ready.";
+            SetOnlineStatus();
+
             _steamClient = new SteamClientProperties();
             TextSteamLocation.Text = _steamClient.GetInstallPath();
+        }
+
+        private async void SetOnlineStatus() {
+            LabelStatus.Content = "Checking internet connection, please wait …";
+            if (!await Task.Run(() => MiscTools.IsComputerOnline())) {
+                LabelStatus.Content = "Computer is not online. All online functionality will be disabled.";
+                _online = false;
+            } else {
+                LabelStatus.Content = "Ready.";
+                _online = true;
+            }
         }
 
         private void ButtonSteamLocation_Click(object sender, RoutedEventArgs e) {
@@ -77,7 +91,20 @@ namespace SteamSkinInstaller {
         }
 
         private async void ButtonRefresh_Click(object sender, RoutedEventArgs e) {
-            // TODO: get newest version of XML skin list file from the GitHub repo
+            if (!_online) return;
+            LabelStatus.Content = "Downloading newest skin catalog file …";
+            BetterWebClient skinDownloadClient = new BetterWebClient();
+            try {
+                await
+                    skinDownloadClient.DownloadFileTaskAsync("http://www.msftncsi.com/ncsi.txt", "ncsi.txt");
+                LabelStatus.Content = "Successfully downloaded the newest skin catalog file!";
+            } catch (Exception) {
+                LabelStatus.Content = "Error while getting the newest skin catalog file (is GitHub offline?).";
+            }
+            for (int i = StackAvailable.Children.Count - 1; i >= 0; i--) {
+                StackAvailable.Children.RemoveAt(i);
+            }
+            // TODO: read new XML file and add skins back to StackAvailable
         }
 
         private StackPanel GetNewAvailableSkinFragment(string name, string author, string description, string wobsite) {
