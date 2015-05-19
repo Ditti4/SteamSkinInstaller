@@ -9,15 +9,19 @@ using System.Threading.Tasks;
 using System.Windows;
 
 namespace SteamSkinInstaller.DownloadHandler {
-    class DeviantArtDownload {
+    class DeviantArtDownload : IDownload {
         private readonly string _url;
         private readonly bool _overwrite;
         private readonly string _filename;
         private string _deviantPageString;
         private CookieContainer _cookieContainer;
+        private int _versionMatchGroup;
+        private string _versionRegexPattern;
+        private string _versionMatchURL;
+        private string _versionPageString;
 
-        public DeviantArtDownload(string url, string filename, bool overwrite = false) {
-            if(string.IsNullOrEmpty(url) || string.IsNullOrEmpty(filename))
+        public DeviantArtDownload(string url, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null, bool overwrite = false) {
+            if(string.IsNullOrEmpty(url) || string.IsNullOrEmpty(filename) || string.IsNullOrEmpty(versionRegexPattern))
                 throw new Exception("None of the parameters can be empty");
             Regex urlRegex = new Regex(@"^(http|https)://[\d\w]*\.deviantart.com/.*");
             if(!urlRegex.IsMatch(url))
@@ -25,15 +29,17 @@ namespace SteamSkinInstaller.DownloadHandler {
             _url = url;
             _filename = filename;
             _overwrite = overwrite;
+            _versionRegexPattern = versionRegexPattern;
+            _versionMatchGroup = versionMatchGroup;
+            _versionMatchURL = versionMatchURL;
         }
 
-        public void DownloadFile() {
+        public void GetFile() {
             if(!Directory.Exists("Downloads"))
                 Directory.CreateDirectory("Downloads");
-            if(string.IsNullOrEmpty(_deviantPageString)) {
+            if(string.IsNullOrEmpty(_deviantPageString))
                 if(!FetchDeviantArtPage())
                     throw new Exception("Couldn't fetch the DeviantArt page of this item");
-            }
             if(File.Exists(Path.Combine("Downloads", _filename)) && !_overwrite)
                 return;
             Regex downloadLinkRegex = new Regex(@"""(http://www\.deviantart\.com/download/\d*/.*)""");
@@ -50,13 +56,20 @@ namespace SteamSkinInstaller.DownloadHandler {
             return _deviantPageString != null;
         }
 
-        public string GetVersionString(string regexPattern, int matchGroup) {
-            Regex versionRegex = new Regex(regexPattern);
-            if(string.IsNullOrEmpty(_deviantPageString)) {
-                if(!FetchDeviantArtPage())
-                    throw new Exception("Couldn't fetch the DeviantArt page of this item");
+        public string GetLatestVersionString() {
+            Regex versionRegex = new Regex(_versionRegexPattern);
+            if (string.IsNullOrEmpty(_versionMatchURL) || _versionMatchURL == _url) {
+                if (string.IsNullOrEmpty(_deviantPageString))
+                    if (!FetchDeviantArtPage())
+                        throw new Exception("Couldn't fetch the DeviantArt page of this item");
+                return versionRegex.Match(_deviantPageString).Groups[_versionMatchGroup].Value;
+            } else {
+                if (string.IsNullOrEmpty(_versionPageString)) {
+                    BetterWebClient versionPageClient = new BetterWebClient();
+                    _versionPageString = versionPageClient.DownloadString(_versionMatchURL);
+                }
+                return versionRegex.Match(_versionPageString).Groups[_versionMatchGroup].Value;
             }
-            return versionRegex.Match(_deviantPageString).Groups[matchGroup].Value;
         }
     }
 }
