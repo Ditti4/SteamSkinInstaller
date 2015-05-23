@@ -23,8 +23,8 @@ namespace SteamSkinInstaller {
 
         public NotAdminDialog() {
             InitializeComponent();
-            Left = (System.Windows.SystemParameters.PrimaryScreenWidth / 2) - (Width / 2);
-            Top = (System.Windows.SystemParameters.PrimaryScreenHeight / 2) - (Height / 2);
+            Left = (SystemParameters.PrimaryScreenWidth / 2) - (Width / 2);
+            Top = (SystemParameters.PrimaryScreenHeight / 2) - (Height / 2);
             ShieldIcon.Source = MiscTools.GetUACShieldIcon();
         }
 

@@ -41,7 +41,7 @@ namespace SteamSkinInstaller {
         }
 
         public static bool CopyFontFile(string filename) {
-            if (String.IsNullOrEmpty(filename))
+            if (string.IsNullOrEmpty(filename))
                 return false;
             if (!File.Exists(filename))
                 return false;
