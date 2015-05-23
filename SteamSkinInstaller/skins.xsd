@@ -4,30 +4,34 @@
 <xs:element name="skins">
   <xs:complexType>
     <xs:sequence>
-      <xs:element name="skin">
+      <xs:element name="skin" maxOccurs="unbounded">
         <xs:complexType>
-          <xs:sequence>
+          <xs:all>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="author" type="xs:string"/>
             <xs:element name="description" type="xs:string"/>
             <xs:element name="website" type="xs:string"/>
             <xs:element name="download">
               <xs:complexType>
-                <xs:sequence>
-                  <xs:element name="method" type="xs:string"/>
-                  <xs:element name="devianturl" type="xs:string"/>
-                </xs:sequence>
+                <xs:all>
+                  <xs:element name="method" type="xs:string" minOccurs="0"/>
+                  <xs:element name="devianturl" type="xs:string" minOccurs="0"/>
+                  <xs:element name="githubuser" type="xs:string" minOccurs="0"/>
+                  <xs:element name="githubrepo" type="xs:string" minOccurs="0"/>
+                  <xs:element name="githubusetags" type="xs:boolean" minOccurs="0"/>
+                </xs:all>
               </xs:complexType>
             </xs:element>
-            <xs:element name="version">
+            <xs:element name="version" minOccurs="0">
               <xs:complexType>
-                <xs:sequence>
-                  <xs:element name="pattern" type="xs:string"/>
-                  <xs:element name="patterngroup" type="xs:int"/>
-                </xs:sequence>
+                <xs:all>
+                  <xs:element name="pattern" type="xs:string" minOccurs="0"/>
+                  <xs:element name="patterngroup" type="xs:int" minOccurs="0"/>
+                  <xs:element name="matchurl" type="xs:string" minOccurs="0"/>
+                </xs:all>
               </xs:complexType>
             </xs:element>
-          </xs:sequence>
+          </xs:all>
         </xs:complexType>
       </xs:element>
     </xs:sequence>

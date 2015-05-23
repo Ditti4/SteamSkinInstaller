@@ -4,7 +4,7 @@
   <skin>
     <name>Metro for Steam</name>
     <author>BoneyardBrew</author>
-    <description></description>
+    <description>Lorem Ipsum</description>
     <website>http://metroforsteam.com</website>
     <download>
       <method>deviantart</method>
@@ -14,5 +14,16 @@
       <pattern>Metro for Steam - ((\d\.)*)</pattern>
       <patterngroup>2</patterngroup>
     </version>
+  </skin>
+  <skin>
+    <name>Pressure for Steam</name>
+    <author>DirtDiglett</author>
+    <description>Lorem Ipsum</description>
+    <website>http://hydra.tf/pressure</website>
+    <download>
+      <method>github</method>
+      <githubuser>dirtdiglett</githubuser>
+      <githubrepo>pressure-for-steam</githubrepo>
+    </download>
   </skin>
 </skins>
