@@ -20,6 +20,7 @@ namespace SteamSkinInstaller {
         private SteamClientProperties _steamClient;
         private WindowsPrincipal _principal;
         private bool _online;
+        private List<Skin> _skinsList;
 
         public bool IsAdmin() {
             _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent());
@@ -28,40 +29,49 @@ namespace SteamSkinInstaller {
 
         public MainWindow() {
             InitializeComponent();
-            Left = (System.Windows.SystemParameters.PrimaryScreenWidth/2) - (Width/2);
-            Top = (System.Windows.SystemParameters.PrimaryScreenHeight/2) - (Height/2);
-            if (System.Environment.OSVersion.Version.Major >= 6 && ! IsAdmin()) {
+            Left = (SystemParameters.PrimaryScreenWidth/2) - (Width/2);
+            Top = (SystemParameters.PrimaryScreenHeight/2) - (Height/2);
+            if (Environment.OSVersion.Version.Major >= 6 && ! IsAdmin()) {
                 NotAdminDialog notAdminDialog = new NotAdminDialog();
                 notAdminDialog.ShowDialog();
                 if(notAdminDialog.DialogResult.HasValue && notAdminDialog.DialogResult.Value) {
                     ProcessStartInfo restartProgramInfo = new ProcessStartInfo {
-                        FileName = System.Reflection.Assembly.GetEntryAssembly().CodeBase,
+                        FileName = Assembly.GetEntryAssembly().CodeBase,
                         Verb = "runas"
                     };
                     try {
                         Process.Start(restartProgramInfo);
                         Close();
                     } catch (Exception) {
-                        // user just said "no" to the UAC request so we're falling back to non-elevated mode
+                        // user denied the UAC request so we're falling back to non-elevated mode
+                        // note: this'll disable stuff like installing skins when Steam is
+                        // installed in C:\Program Files or something similar
                     }
                 }
             }
 
             SetOnlineStatus();
 
+            ReadSkinsFile();
+            foreach (Skin skin in _skinsList) {
+                StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
+            }
+
             _steamClient = new SteamClientProperties();
             TextSteamLocation.Text = _steamClient.GetInstallPath();
+
         }
 
         private async void SetOnlineStatus() {
             LabelStatus.Content = "Checking internet connection, please wait …";
             if (!await Task.Run(() => MiscTools.IsComputerOnline())) {
                 LabelStatus.Content = "Computer is not online. All online functionality will be disabled.";
+                await Task.Delay(5000);
                 _online = false;
             } else {
-                LabelStatus.Content = "Ready.";
                 _online = true;
             }
+            LabelStatus.Content = "Ready.";
         }
 
         private void ButtonSteamLocation_Click(object sender, RoutedEventArgs e) {
@@ -87,21 +97,33 @@ namespace SteamSkinInstaller {
         private async void ButtonRefresh_Click(object sender, RoutedEventArgs e) {
             if (!_online) return;
             LabelStatus.Content = "Downloading newest skin catalog file …";
+            DisableControls();
             BetterWebClient skinDownloadClient = new BetterWebClient();
             try {
-                await
-                    skinDownloadClient.DownloadFileTaskAsync("http://www.msftncsi.com/ncsi.txt", "ncsi.txt");
-                LabelStatus.Content = "Successfully downloaded the newest skin catalog file!";
+                // TODO: await skinDownloadClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Ditti4/SteamSkinInstaller/master/SteamSkinInstaller/skins.xml", "skins.xml");
+                LabelStatus.Content = "Ready.";
             } catch (Exception) {
-                LabelStatus.Content = "Error while getting the newest skin catalog file (is GitHub offline?).";
+                MessageBox.Show("Something went wrong when trying to get the skin catalog file. Is GitHub offline? Did you delete the internet?", "Error getting skin catalog");
             }
+            EnableControls();
             for (int i = StackAvailable.Children.Count - 1; i >= 0; i--) {
                 StackAvailable.Children.RemoveAt(i);
             }
-            // TODO: read new XML file and add skins back to StackAvailable
+            ReadSkinsFile();
+            foreach (Skin skin in _skinsList) {
+                StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
+            }
         }
 
-        private StackPanel GetNewAvailableSkinFragment(string name, string author, string description, string wobsite) {
+        private void EnableControls() {
+            // TODO
+        }
+
+        private void DisableControls() {
+            // TODO
+        }
+
+        private StackPanel GetNewAvailableSkinFragment(Skin skin) {
             StackPanel outerSkinPanel = new StackPanel();
             Label skinNameLabel = new Label();
             Label skinAuthorLabel = new Label();
@@ -109,34 +131,48 @@ namespace SteamSkinInstaller {
             Button installButton = new Button();
             DockPanel innerSkinPanel = new DockPanel();
             TextBlock skinDescTextBlock = new TextBlock();
-            Button wobsiteButton = new Button();
+            Button websiteButton = new Button();
 
-            skinNameLabel.Content = name;
+            skinNameLabel.Content = skin.Name;
             skinNameLabel.Padding = new Thickness(0, 10, 0, 0);
             skinNameLabel.FontSize = 20;
 
-            skinAuthorLabel.Content = "by " + author;
+            skinAuthorLabel.Content = "by " + skin.Author;
             skinAuthorLabel.Padding = new Thickness(0);
             outerSkinPanel.Orientation = Orientation.Vertical;
 
-            skinDescTextBlock.Text = description;
+            skinDescTextBlock.Text = skin.Description;
             skinDescTextBlock.TextWrapping = TextWrapping.Wrap;
             skinDescTextBlock.Margin = new Thickness(10);
 
             installButton.Content = "Install";
             installButton.Style = FindResource("KewlButton") as Style;
             installButton.Margin = new Thickness(5);
-            wobsiteButton.Content = "Visit website";
-            wobsiteButton.Style = FindResource("KewlButton") as Style;
-            wobsiteButton.Margin = new Thickness(5);
-            wobsiteButton.Click += delegate {
-                Process.Start(wobsite);
+            installButton.Click += async (sender, args) => {
+                LabelStatus.Content = "Installing " + skin.Name + ". Please wait …";
+                DisableControls();
+                switch (await (Task.Run(() => skin.Install()))) {
+                    case 0:
+                        break;
+                    // TODO: add more possible failure reasons including appropiate message boxes
+                    default:
+                        MessageBox.Show("Something went wrong when trying to install " + skin.Name + ".", "Error installing skin");
+                        break;
+                }
+                LabelStatus.Content = "Ready.";
+                EnableControls();
             };
-            wobsiteButton.ToolTip = "Click here to see screenshots and more!";
+            websiteButton.Content = "Visit website";
+            websiteButton.Style = FindResource("KewlButton") as Style;
+            websiteButton.Margin = new Thickness(5);
+            websiteButton.Click += (sender, args) => {
+                Process.Start(skin.Website);
+            };
+            websiteButton.ToolTip = "Click here to see screenshots and more!";
             buttonPanel.Orientation = Orientation.Vertical;
 
             buttonPanel.Children.Add(installButton);
-            buttonPanel.Children.Add(wobsiteButton);
+            buttonPanel.Children.Add(websiteButton);
 
             DockPanel.SetDock(skinDescTextBlock, Dock.Left);
             DockPanel.SetDock(buttonPanel, Dock.Right);
@@ -149,6 +185,22 @@ namespace SteamSkinInstaller {
             outerSkinPanel.Children.Add(innerSkinPanel);
 
             return outerSkinPanel;
+        }
+
+        private void ReadSkinsFile() {
+            XDocument document = XDocument.Load("skins.xml");
+            try {
+                using (FileStream skinCatalogFile = new FileStream("skins.xml", FileMode.Open)) {
+                    XmlSerializer serializer = new XmlSerializer(typeof (Skin[]));
+                    _skinsList = (serializer.Deserialize(skinCatalogFile) as Skin[]).ToList();
+                }
+            } catch (Exception e) {
+                MessageBox.Show("Invalid skins catalog. Please check it if you modified it or redownload it using the button in the top right corner." +
+                                "Please send in a bug report using the following information (you can use Ctrl + C to copy the content):\n" +
+                                "Exception message:\n" + e.Message + "Current skin catalog:\n" + document +
+                                "Thanks in advance!",
+                    "Error reading the skins catalog file");
+            }
         }
     }
 }

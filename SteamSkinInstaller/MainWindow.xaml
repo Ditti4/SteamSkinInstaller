@@ -15,7 +15,11 @@
                 </Grid>
             </TabItem>
             <TabItem Name="TabInstalled" Header="INSTALLED" Background="{x:Null}" Style="{DynamicResource KewlTabItem}">
-                <Grid/>
+                <Grid ShowGridLines="True">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Name="StackInstalled"/>
+                    </ScrollViewer>
+                </Grid>
             </TabItem>
             <TabItem Name="TabSettings" Header="SETTINGS" Background="{x:Null}" Style="{DynamicResource KewlTabItem}">
                 <Grid>

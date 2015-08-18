@@ -36,28 +36,42 @@ namespace SteamSkinInstaller {
             SendMessage(new IntPtr(0xFFFF), 0x001D, new IntPtr(0), new IntPtr(0));
         }
 
-        public static bool CopyFontFile(string filename) {
-            if (string.IsNullOrEmpty(filename))
-                return false;
-            if (!File.Exists(filename))
-                return false;
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts", Path.GetFileName(filename))))
-                return false;
+        public static int CopyFontFile(string filename) {
+            if (string.IsNullOrEmpty(filename)) {
+                return 1;
+            }
+            if (!File.Exists(filename)) {
+                return 1;
+            }
+            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts", Path.GetFileName(filename)))) {
+                return 2;
+            }
             try {
                 File.Copy(filename, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts", Path.GetFileName(filename)));
             } catch (Exception) {
+                return 1;
+            }
+            return 0;
+        }
+
+        public static bool InstallFont(string fontname, string fontfilename) {
+            int result = CopyFontFile(fontfilename);
+            if (result == 1) {
                 return false;
+            }
+            // TODO: get full font name (ID 4 in naming table) from TTF file and use that to add the font to the registry
+            // ^ Yeah, no, won't do that. Way too much work for that small convenience factor - should probably just "launch" the font file
+            // Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam", fontname, Path.GetFileName(fontfilename));
+            if (result != 2) {
+                SendFontChangeBroadcast();
             }
             return true;
         }
 
-        public static bool RegisterFont(string fontname, string fontfilename) {
-            return true;
-        }
-
         public static bool IsComputerConnected() {
-            if (!NetworkInterface.GetIsNetworkAvailable())
+            if (!NetworkInterface.GetIsNetworkAvailable()) {
                 return false;
+            }
             return
                 NetworkInterface.GetAllNetworkInterfaces()
                     .Any(
@@ -69,8 +83,9 @@ namespace SteamSkinInstaller {
         }
 
         public static bool IsComputerOnline() {
-            if (!IsComputerConnected())
+            if (!IsComputerConnected()) {
                 return false;
+            }
             BetterWebClient ncsiClient = new BetterWebClient();
             return ncsiClient.DownloadString(new Uri("http://www.msftncsi.com/ncsi.txt")).Equals("Microsoft NCSI");
         }

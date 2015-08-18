@@ -7,7 +7,8 @@ namespace SteamSkinInstaller {
     class SteamClientProperties {
         private readonly string _installPath;
         private readonly string _exePath;
-        private bool _beta = false;
+        private string _skin;
+        private bool _beta;
 
         public SteamClientProperties() {
             _installPath =
@@ -19,6 +20,7 @@ namespace SteamSkinInstaller {
                 _exePath = null;
                 throw new Exception("Steam is not installed");
             }
+            _skin = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam", "SkinV4", null) as string;
             if (File.Exists(_installPath + @"\package\beta")) _beta = true;
         }
 
@@ -59,7 +61,12 @@ namespace SteamSkinInstaller {
         }
 
         public void SetSkin(string skinName) {
+            _skin = skinName;
             Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam", "SkinV4", skinName);
+        }
+
+        public string GetSkin() {
+            return _skin;
         }
     }
 }

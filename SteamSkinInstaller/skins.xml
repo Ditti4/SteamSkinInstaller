@@ -10,10 +10,10 @@
       <method>deviantart</method>
       <devianturl>http://boneyardbrew.deviantart.com/art/Metro-for-Steam-3-9-1-292419787</devianturl>
     </download>
-    <version>
+    <remoteversion>
       <pattern>Metro for Steam - ((\d\.)*)</pattern>
       <patterngroup>2</patterngroup>
-    </version>
+    </remoteversion>
   </skin>
   <skin>
     <name>Pressure for Steam</name>
