@@ -6,7 +6,7 @@
         <ResourceDictionary Source="KewlResources.xaml"/>
     </Window.Resources>
     <Grid>
-        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" Background="{x:Null}" BorderThickness="0" SelectionChanged="TabControl_SelectionChanged">
+        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,10,0,24" Background="{x:Null}" BorderThickness="0" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Name="TabAvailable" Header="AVAILABLE" Background="{x:Null}" Style="{DynamicResource KewlTabItem}">
                 <Grid ShowGridLines="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">

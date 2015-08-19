@@ -29,7 +29,7 @@ namespace SteamSkinInstaller {
                 public string Fontname;
             }
 
-            public List<Font> Fonts;
+            public List<Font> FontList;
         }
 
         public string Author;

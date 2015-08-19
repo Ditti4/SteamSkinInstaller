@@ -190,9 +190,9 @@ namespace SteamSkinInstaller {
         private void ReadSkinsFile() {
             XDocument document = XDocument.Load("skins.xml");
             try {
-                using (FileStream skinCatalogFile = new FileStream("skins.xml", FileMode.Open)) {
-                    XmlSerializer serializer = new XmlSerializer(typeof (Skin[]));
-                    _skinsList = (serializer.Deserialize(skinCatalogFile) as Skin[]).ToList();
+                using(FileStream skinCatalogFile = new FileStream("skins.xml", FileMode.Open)) {
+                    XmlSerializer serializer = new XmlSerializer(typeof (List<Skin>));
+                    _skinsList = (serializer.Deserialize(skinCatalogFile) as List<Skin>).OrderBy(skin => skin.Name).ToList();
                 }
             } catch (Exception e) {
                 MessageBox.Show("Invalid skins catalog. Please check it if you modified it or redownload it using the button in the top right corner." +
