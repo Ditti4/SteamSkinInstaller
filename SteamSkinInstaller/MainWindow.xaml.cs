@@ -1,26 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml.Linq;
-using System.Xml.Serialization;
-using SteamSkinInstaller.DownloadHandler;
+using SteamSkinInstaller.Skins;
+using SteamSkinInstaller.Steam;
+using SteamSkinInstaller.Util;
 
 namespace SteamSkinInstaller {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow {
-        private SteamClientProperties _steamClient;
+        private ClientProperties _steamClient;
         private WindowsPrincipal _principal;
         private bool _online;
-        private List<Skin> _skinsList;
+        private readonly Catalog _availableSkinsCatalog;
+        private readonly Catalog _installedSkinsCatalog;
+        private List<Skin> _availableSkins;
+        private List<Skin> _installedSkins;
+        private readonly TextBlock _noCatalogWarning;
+        private readonly TextBlock _errorReadingCatalogWarning;
 
         public bool IsAdmin() {
             _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent());
@@ -50,14 +53,41 @@ namespace SteamSkinInstaller {
                 }
             }
 
-            SetOnlineStatus();
+            int returncode;
 
-            ReadSkinsFile();
-            foreach (Skin skin in _skinsList) {
-                StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
+            _steamClient = new ClientProperties();
+
+            _availableSkinsCatalog = new Catalog("skins.xml");
+
+            _noCatalogWarning = new TextBlock {
+                Text = "Skin catalog file not found. Try clicking the button in the top right corner.",
+                Margin = new Thickness(10),
+                TextWrapping = TextWrapping.WrapWithOverflow
+            };
+            _errorReadingCatalogWarning = new TextBlock {
+                Text = "Error while trying to read the skin catalog file. You should try redownloading it in the top right corner.",
+                Margin = new Thickness(10),
+                TextWrapping = TextWrapping.WrapWithOverflow
+            };
+
+            _availableSkins = _availableSkinsCatalog.GetSkins(out returncode);
+
+            switch (returncode) {
+                case 0:
+                    foreach (Skin skin in _availableSkins) {
+                        StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
+                    }
+                    break;
+                case 1:
+                    StackAvailable.Children.Add(_noCatalogWarning);
+                    break;
+                case 2:
+                    StackAvailable.Children.Add(_errorReadingCatalogWarning);
+                    break;
             }
 
-            _steamClient = new SteamClientProperties();
+            SetOnlineStatus();
+
             TextSteamLocation.Text = _steamClient.GetInstallPath();
 
         }
@@ -82,7 +112,7 @@ namespace SteamSkinInstaller {
             };
             if (steamFolder.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
             try {
-                SteamClientProperties newClient = new SteamClientProperties(steamFolder.SelectedPath);
+                ClientProperties newClient = new ClientProperties(steamFolder.SelectedPath);
                 _steamClient = newClient;
                 TextSteamLocation.Text = _steamClient.GetInstallPath();
             } catch (Exception exc) {
@@ -109,9 +139,22 @@ namespace SteamSkinInstaller {
             for (int i = StackAvailable.Children.Count - 1; i >= 0; i--) {
                 StackAvailable.Children.RemoveAt(i);
             }
-            ReadSkinsFile();
-            foreach (Skin skin in _skinsList) {
-                StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
+            int returncode;
+
+            _availableSkins = _availableSkinsCatalog.GetSkins(out returncode);
+
+            switch(returncode) {
+                case 0:
+                    foreach(Skin skin in _availableSkins) {
+                        StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
+                    }
+                    break;
+                case 1:
+                    StackAvailable.Children.Add(_noCatalogWarning);
+                    break;
+                case 2:
+                    StackAvailable.Children.Add(_errorReadingCatalogWarning);
+                    break;
             }
         }
 
@@ -133,15 +176,15 @@ namespace SteamSkinInstaller {
             TextBlock skinDescTextBlock = new TextBlock();
             Button websiteButton = new Button();
 
-            skinNameLabel.Content = skin.Name;
+            skinNameLabel.Content = skin.Entry.Name;
             skinNameLabel.Padding = new Thickness(0, 10, 0, 0);
             skinNameLabel.FontSize = 20;
 
-            skinAuthorLabel.Content = "by " + skin.Author;
+            skinAuthorLabel.Content = "by " + skin.Entry.Author;
             skinAuthorLabel.Padding = new Thickness(0);
             outerSkinPanel.Orientation = Orientation.Vertical;
 
-            skinDescTextBlock.Text = skin.Description;
+            skinDescTextBlock.Text = skin.Entry.Description;
             skinDescTextBlock.TextWrapping = TextWrapping.Wrap;
             skinDescTextBlock.Margin = new Thickness(10);
 
@@ -149,14 +192,14 @@ namespace SteamSkinInstaller {
             installButton.Style = FindResource("KewlButton") as Style;
             installButton.Margin = new Thickness(5);
             installButton.Click += async (sender, args) => {
-                LabelStatus.Content = "Installing " + skin.Name + ". Please wait …";
+                LabelStatus.Content = "Installing " + skin.Entry.Name + ". Please wait …";
                 DisableControls();
                 switch (await (Task.Run(() => skin.Install()))) {
                     case 0:
                         break;
                     // TODO: add more possible failure reasons including appropiate message boxes
                     default:
-                        MessageBox.Show("Something went wrong when trying to install " + skin.Name + ".", "Error installing skin");
+                        MessageBox.Show("Something went wrong when trying to install " + skin.Entry.Name + ".", "Error installing skin");
                         break;
                 }
                 LabelStatus.Content = "Ready.";
@@ -166,7 +209,7 @@ namespace SteamSkinInstaller {
             websiteButton.Style = FindResource("KewlButton") as Style;
             websiteButton.Margin = new Thickness(5);
             websiteButton.Click += (sender, args) => {
-                Process.Start(skin.Website);
+                Process.Start(skin.Entry.Website);
             };
             websiteButton.ToolTip = "Click here to see screenshots and more!";
             buttonPanel.Orientation = Orientation.Vertical;
@@ -185,22 +228,6 @@ namespace SteamSkinInstaller {
             outerSkinPanel.Children.Add(innerSkinPanel);
 
             return outerSkinPanel;
-        }
-
-        private void ReadSkinsFile() {
-            XDocument document = XDocument.Load("skins.xml");
-            try {
-                using(FileStream skinCatalogFile = new FileStream("skins.xml", FileMode.Open)) {
-                    XmlSerializer serializer = new XmlSerializer(typeof (List<Skin>));
-                    _skinsList = (serializer.Deserialize(skinCatalogFile) as List<Skin>).OrderBy(skin => skin.Name).ToList();
-                }
-            } catch (Exception e) {
-                MessageBox.Show("Invalid skins catalog. Please check it if you modified it or redownload it using the button in the top right corner." +
-                                "Please send in a bug report using the following information (you can use Ctrl + C to copy the content):\n" +
-                                "Exception message:\n" + e.Message + "Current skin catalog:\n" + document +
-                                "Thanks in advance!",
-                    "Error reading the skins catalog file");
-            }
         }
     }
 }

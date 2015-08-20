@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.IO;
+using System.Linq;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using SteamSkinInstaller.DownloadHandler;
 
-
-namespace SteamSkinInstaller {
+namespace SteamSkinInstaller.Util {
     static class MiscTools {
         [DllImport("user32.dll")]
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);

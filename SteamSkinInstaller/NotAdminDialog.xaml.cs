@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
+using SteamSkinInstaller.Util;
 
 namespace SteamSkinInstaller {
     /// <summary>

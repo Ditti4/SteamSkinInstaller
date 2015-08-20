@@ -88,18 +88,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="DownloadHandler\BetterWebClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="DownloadHandler\DeviantArtDownload.cs" />
     <Compile Include="DownloadHandler\GitHubDownload.cs" />
     <Compile Include="DownloadHandler\IDownload.cs" />
-    <Compile Include="MiscTools.cs" />
     <Compile Include="NotAdminDialog.xaml.cs">
       <DependentUpon>NotAdminDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Skin.cs" />
-    <Compile Include="SteamClientProperties.cs" />
+    <Compile Include="Skins\Catalog.cs" />
+    <Compile Include="Skins\CatalogEntry.cs" />
+    <Compile Include="Skins\Skin.cs" />
+    <Compile Include="Steam\ClientProperties.cs" />
+    <Compile Include="Util\BetterWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Util\MiscTools.cs" />
     <Page Include="KewlResources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -151,9 +153,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Exceptions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
       <Visible>False</Visible>

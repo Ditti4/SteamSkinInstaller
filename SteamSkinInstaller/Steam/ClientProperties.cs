@@ -1,16 +1,16 @@
 ﻿using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
-namespace SteamSkinInstaller {
-    class SteamClientProperties {
+namespace SteamSkinInstaller.Steam {
+    class ClientProperties {
         private readonly string _installPath;
         private readonly string _exePath;
         private string _skin;
         private bool _beta;
 
-        public SteamClientProperties() {
+        public ClientProperties() {
             _installPath =
                 Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\" + ((Environment.Is64BitOperatingSystem) ? "Wow6432Node" : "") + @"\Valve\Steam",
                     "InstallPath", Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)) as string;
@@ -24,7 +24,7 @@ namespace SteamSkinInstaller {
             if (File.Exists(_installPath + @"\package\beta")) _beta = true;
         }
 
-        public SteamClientProperties(string installPath) {
+        public ClientProperties(string installPath) {
             if(!File.Exists(installPath + @"\Steam.exe")) {
                 _installPath = null;
                 throw new Exception("Invalid Steam install path");
