@@ -26,7 +26,7 @@ namespace SteamSkinInstaller {
         private readonly TextBlock _errorReadingCatalogWarning;
 
         public bool IsAdmin() {
-            _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent() ?? new WindowsIdentity(""));
             return _principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
@@ -121,7 +121,7 @@ namespace SteamSkinInstaller {
         }
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            ButtonRefresh.Visibility = Equals((sender as TabControl).SelectedItem, TabSettings) ? Visibility.Hidden : Visibility.Visible;
+            ButtonRefresh.Visibility = TabSettings.Equals(((TabControl) sender).SelectedItem) ? Visibility.Hidden : Visibility.Visible;
         }
 
         private async void ButtonRefresh_Click(object sender, RoutedEventArgs e) {
@@ -189,7 +189,7 @@ namespace SteamSkinInstaller {
             skinDescTextBlock.Margin = new Thickness(10);
 
             installButton.Content = "Install";
-            installButton.Style = FindResource("KewlButton") as Style;
+            installButton.Style = (Style) FindResource("KewlButton");
             installButton.Margin = new Thickness(5);
             installButton.Click += async (sender, args) => {
                 LabelStatus.Content = "Installing " + skin.Entry.Name + ". Please wait …";
@@ -206,7 +206,7 @@ namespace SteamSkinInstaller {
                 EnableControls();
             };
             websiteButton.Content = "Visit website";
-            websiteButton.Style = FindResource("KewlButton") as Style;
+            websiteButton.Style = (Style) FindResource("KewlButton");
             websiteButton.Margin = new Thickness(5);
             websiteButton.Click += (sender, args) => {
                 Process.Start(skin.Entry.Website);

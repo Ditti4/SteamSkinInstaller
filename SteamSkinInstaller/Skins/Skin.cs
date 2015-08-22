@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using SteamSkinInstaller.DownloadHandler;
 
@@ -66,7 +67,8 @@ namespace SteamSkinInstaller.Skins {
 
         public int InstallFonts(List<CatalogEntry.ExtraInfo.Font> fontList) {
             foreach(CatalogEntry.ExtraInfo.Font font in fontList) {
-
+                // TODO: check if user wants to use the experimental install method (copy, add to registry, SendMessage())
+                Process.Start(font.Filename);
             }
             return 0;
         }

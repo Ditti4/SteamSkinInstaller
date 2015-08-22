@@ -26,7 +26,7 @@ namespace SteamSkinInstaller.Skins {
             } else {
                 try {
                     using (FileStream inFileStream = File.Open(_filename, FileMode.Open)) {
-                        returnList = _serializer.Deserialize(inFileStream) as List<CatalogEntry>;
+                        returnList = (List<CatalogEntry>) _serializer.Deserialize(inFileStream);
                         errorcode = 0;
                     }
                 } catch (Exception e) {
