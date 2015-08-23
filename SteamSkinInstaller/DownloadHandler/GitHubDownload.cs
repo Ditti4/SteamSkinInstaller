@@ -8,19 +8,27 @@ namespace SteamSkinInstaller.DownloadHandler {
         private readonly string _user;
         private readonly string _repo;
         private readonly string _filename;
+        private readonly int _versionMatchGroup;
+        private readonly string _versionRegexPattern;
+        private readonly string _versionMatchURL;
         private readonly bool _overwrite;
         private readonly bool _usetags;
         private string _latestTag;
         private const string GithubAPIRepoBaseURL = "https://api.github.com/repos/";
         private const string GithubBaseURL = "https://github.com/";
+        private string _versionPageString;
 
-        public GitHubDownload(string user, string repo, string filename, bool overwrite = false, bool usetags = false) {
+        public GitHubDownload(string user, string repo, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null,
+            bool overwrite = false, bool usetags = false) {
             if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(repo) || string.IsNullOrEmpty(filename)) {
                 throw new Exception("None of the parameters can be empty");
             }
             _user = user;
             _repo = repo;
             _filename = filename;
+            _versionRegexPattern = versionRegexPattern;
+            _versionMatchGroup = versionMatchGroup;
+            _versionMatchURL = versionMatchURL;
             _overwrite = overwrite;
             _usetags = usetags;
         }
@@ -72,8 +80,15 @@ namespace SteamSkinInstaller.DownloadHandler {
         }
 
         public string GetLatestVersionString() {
-            // TODO: implement support for custom remote version information
-            return _usetags ? GetLatestReleaseTag() : GetLatestCommitHash();
+            if (string.IsNullOrEmpty(_versionMatchURL) || _versionMatchURL == (GithubBaseURL + _user + _repo)) {
+                return _usetags ? GetLatestReleaseTag() : GetLatestCommitHash();
+            }
+            Regex versionRegex = new Regex(_versionRegexPattern);
+            if(string.IsNullOrEmpty(_versionPageString)) {
+                BetterWebClient versionPageClient = new BetterWebClient();
+                _versionPageString = versionPageClient.DownloadString(_versionMatchURL);
+            }
+            return versionRegex.Match(_versionPageString).Groups[_versionMatchGroup].Value;
         }
     }
 }

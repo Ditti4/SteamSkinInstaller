@@ -17,7 +17,8 @@ namespace SteamSkinInstaller.Skins {
             if(_downloadHandler == null) {
                 switch(Entry.FileDownload.Method.ToLower()) {
                     case "github":
-                        _downloadHandler = new GitHubDownload(Entry.FileDownload.GithubUser, Entry.FileDownload.GithubRepo, Entry.Name + ".zip");
+                        _downloadHandler = new GitHubDownload(Entry.FileDownload.GithubUser, Entry.FileDownload.GithubRepo, Entry.Name + ".zip",
+                            Entry.RemoteVersionInfo.MatchPattern, Entry.RemoteVersionInfo.MatchGroup, Entry.RemoteVersionInfo.MatchURL);
                         break;
                     case "deviantart":
                         _downloadHandler = new DeviantArtDownload(Entry.FileDownload.DeviantURL, Entry.Name + ".zip", Entry.RemoteVersionInfo.MatchPattern,

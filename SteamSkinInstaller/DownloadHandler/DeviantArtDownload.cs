@@ -11,9 +11,9 @@ namespace SteamSkinInstaller.DownloadHandler {
         private readonly string _filename;
         private string _deviantPageString;
         private CookieContainer _cookieContainer;
-        private int _versionMatchGroup;
-        private string _versionRegexPattern;
-        private string _versionMatchURL;
+        private readonly int _versionMatchGroup;
+        private readonly string _versionRegexPattern;
+        private readonly string _versionMatchURL;
         private string _versionPageString;
 
         public DeviantArtDownload(string url, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null, bool overwrite = false) {
@@ -33,8 +33,9 @@ namespace SteamSkinInstaller.DownloadHandler {
         }
 
         public void GetFile() {
-            if(!Directory.Exists("Downloads"))
+            if (!Directory.Exists("Downloads")) {
                 Directory.CreateDirectory("Downloads");
+            }
             if (string.IsNullOrEmpty(_deviantPageString)) {
                 if (!FetchDeviantArtPage()) {
                     throw new Exception("Couldn't fetch the DeviantArt page of this item");
