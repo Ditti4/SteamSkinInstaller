@@ -28,7 +28,7 @@ namespace SteamSkinInstaller.Skin {
                         break;
                     case "deviantart":
                         _downloadHandler = new DeviantArtDownload(Entry.FileDownload.DeviantURL, Entry.Name + ".zip", Entry.RemoteVersionInfo.MatchPattern,
-                            Entry.RemoteVersionInfo.MatchGroup, Entry.RemoteVersionInfo.MatchURL);
+                            Entry.RemoteVersionInfo.MatchGroup, Entry.RemoteVersionInfo.MatchURL, Entry.FileDownload.Foldername ?? Entry.Name);
                         break;
                     case "direct":
                         // TODO
