@@ -50,7 +50,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>0545DBDA6C3F6B921C38FEB2CDFFE32BF541D3CD</ManifestCertificateThumbprint>
@@ -84,43 +85,41 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
     <Compile Include="DownloadHandler\DeviantArtDownload.cs" />
     <Compile Include="DownloadHandler\GitHubDownload.cs" />
     <Compile Include="DownloadHandler\IDownload.cs" />
-    <Compile Include="NotAdminDialog.xaml.cs">
-      <DependentUpon>NotAdminDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Skin\Catalog.cs" />
     <Compile Include="Skin\CatalogEntry.cs" />
     <Compile Include="Skin\Skin.cs" />
     <Compile Include="Steam\ClientProperties.cs" />
+    <Compile Include="UI\App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\NotAdminDialog.xaml.cs">
+      <DependentUpon>NotAdminDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Util\BetterWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Util\MiscTools.cs" />
-    <Page Include="KewlResources.xaml">
-      <SubType>Designer</SubType>
+    <ApplicationDefinition Include="UI\App.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="UI\KewlResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="NotAdminDialog.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="UI\NotAdminDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +152,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="UI\icon.ico" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
       <Visible>False</Visible>
@@ -170,9 +171,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="skins.xml">

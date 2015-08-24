@@ -86,7 +86,7 @@ namespace SteamSkinInstaller.Skin {
 
         public string GetLocalVersion() {
             try {
-                string verisonFileContent = File.ReadAllText(Path.Combine(MainWindow.SteamClient.GetInstallPath(), Entry.LocalVersionInfo.MatchURL));
+                string verisonFileContent = File.ReadAllText(Path.Combine(UI.MainWindow.SteamClient.GetInstallPath(), Entry.LocalVersionInfo.MatchURL));
                 Regex versionRegex = new Regex(Entry.LocalVersionInfo.MatchPattern);
                 return versionRegex.Match(verisonFileContent).Groups[Entry.LocalVersionInfo.MatchGroup].Value;
             } catch (Exception) {

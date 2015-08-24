@@ -10,7 +10,7 @@ using SteamSkinInstaller.Skin;
 using SteamSkinInstaller.Steam;
 using SteamSkinInstaller.Util;
 
-namespace SteamSkinInstaller {
+namespace SteamSkinInstaller.UI {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>

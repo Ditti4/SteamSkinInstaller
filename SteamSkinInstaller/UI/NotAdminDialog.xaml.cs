@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using SteamSkinInstaller.Util;
 
-namespace SteamSkinInstaller {
+namespace SteamSkinInstaller.UI {
     /// <summary>
     /// Interaction logic for NotAdminDialog.xaml
     /// </summary>
