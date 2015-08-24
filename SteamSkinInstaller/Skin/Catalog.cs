@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Xml.Serialization;
 
-namespace SteamSkinInstaller.Skins {
+namespace SteamSkinInstaller.Skin {
     class Catalog {
         private readonly XmlSerializer _serializer;
         private readonly string _filename;

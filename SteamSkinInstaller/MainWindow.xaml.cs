@@ -6,7 +6,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using SteamSkinInstaller.Skins;
+using SteamSkinInstaller.Skin;
 using SteamSkinInstaller.Steam;
 using SteamSkinInstaller.Util;
 
@@ -20,8 +20,8 @@ namespace SteamSkinInstaller {
         private bool _online;
         private readonly Catalog _availableSkinsCatalog;
         private readonly Catalog _installedSkinsCatalog;
-        private List<Skin> _availableSkins;
-        private List<Skin> _installedSkins;
+        private List<Skin.Skin> _availableSkins;
+        private List<Skin.Skin> _installedSkins;
         private readonly TextBlock _noCatalogWarning;
         private readonly TextBlock _errorReadingCatalogWarning;
 
@@ -74,7 +74,7 @@ namespace SteamSkinInstaller {
 
             switch (returncode) {
                 case 0:
-                    foreach (Skin skin in _availableSkins) {
+                    foreach (Skin.Skin skin in _availableSkins) {
                         StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
                     }
                     break;
@@ -145,7 +145,7 @@ namespace SteamSkinInstaller {
 
             switch(returncode) {
                 case 0:
-                    foreach(Skin skin in _availableSkins) {
+                    foreach(Skin.Skin skin in _availableSkins) {
                         StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
                     }
                     break;
@@ -166,7 +166,7 @@ namespace SteamSkinInstaller {
             // TODO
         }
 
-        private StackPanel GetNewAvailableSkinFragment(Skin skin) {
+        private StackPanel GetNewAvailableSkinFragment(Skin.Skin skin) {
             StackPanel outerSkinPanel = new StackPanel();
             Label skinNameLabel = new Label();
             Label skinAuthorLabel = new Label();

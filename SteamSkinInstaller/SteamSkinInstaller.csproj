@@ -94,9 +94,9 @@
     <Compile Include="NotAdminDialog.xaml.cs">
       <DependentUpon>NotAdminDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Skins\Catalog.cs" />
-    <Compile Include="Skins\CatalogEntry.cs" />
-    <Compile Include="Skins\Skin.cs" />
+    <Compile Include="Skin\Catalog.cs" />
+    <Compile Include="Skin\CatalogEntry.cs" />
+    <Compile Include="Skin\Skin.cs" />
     <Compile Include="Steam\ClientProperties.cs" />
     <Compile Include="Util\BetterWebClient.cs">
       <SubType>Component</SubType>

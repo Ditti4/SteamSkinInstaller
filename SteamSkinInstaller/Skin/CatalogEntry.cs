@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SteamSkinInstaller.Skins {
+namespace SteamSkinInstaller.Skin {
     public class CatalogEntry {
         public class DownloadInfo {
             public string Method;

@@ -5,7 +5,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using SteamSkinInstaller.DownloadHandler;
 
-namespace SteamSkinInstaller.Skins {
+namespace SteamSkinInstaller.Skin {
     class Skin {
         private IDownload _downloadHandler;
         public readonly CatalogEntry Entry;
