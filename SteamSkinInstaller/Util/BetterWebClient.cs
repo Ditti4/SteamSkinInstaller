@@ -25,12 +25,13 @@ namespace SteamSkinInstaller.Util {
 
         protected override WebRequest GetWebRequest(Uri url) {
             WebRequest request = base.GetWebRequest(url);
-            if(request is HttpWebRequest) {
-                ((HttpWebRequest) request).KeepAlive = false;
-                ((HttpWebRequest) request).UserAgent =
+            HttpWebRequest webRequest = request as HttpWebRequest;
+            if(webRequest != null) {
+                webRequest.KeepAlive = false;
+                webRequest.UserAgent =
                     "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36";
-                ((HttpWebRequest)request).CookieContainer = Cookies;
-                ((HttpWebRequest)request).Referer = Referer;
+                webRequest.CookieContainer = Cookies;
+                webRequest.Referer = Referer;
             }
             return request;
         }
