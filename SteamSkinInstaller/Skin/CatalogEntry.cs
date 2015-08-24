@@ -9,6 +9,7 @@ namespace SteamSkinInstaller.Skin {
             public string GithubUser;
             public string GithubRepo;
             public bool GithubUseTags;
+            public bool CreateFolder;
         }
 
         public class VersionInfo {

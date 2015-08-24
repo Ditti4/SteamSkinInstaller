@@ -14,9 +14,11 @@ namespace SteamSkinInstaller.DownloadHandler {
         private readonly int _versionMatchGroup;
         private readonly string _versionRegexPattern;
         private readonly string _versionMatchURL;
+        private readonly string _foldername;
         private string _versionPageString;
 
-        public DeviantArtDownload(string url, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null, bool overwrite = false) {
+        public DeviantArtDownload(string url, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null,
+            string foldername = null, bool overwrite = false) {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(filename) || string.IsNullOrEmpty(versionRegexPattern)) {
                 throw new Exception("None of the parameters can be empty");
             }
@@ -30,6 +32,7 @@ namespace SteamSkinInstaller.DownloadHandler {
             _versionRegexPattern = versionRegexPattern;
             _versionMatchGroup = versionMatchGroup;
             _versionMatchURL = versionMatchURL;
+            _foldername = foldername;
         }
 
         public void GetFile() {
@@ -73,6 +76,10 @@ namespace SteamSkinInstaller.DownloadHandler {
                 _versionPageString = versionPageClient.DownloadString(_versionMatchURL);
             }
             return versionRegex.Match(_versionPageString).Groups[_versionMatchGroup].Value;
+        }
+
+        public string GetFolderName() {
+            return _foldername;
         }
     }
 }

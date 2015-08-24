@@ -90,5 +90,9 @@ namespace SteamSkinInstaller.DownloadHandler {
             }
             return versionRegex.Match(_versionPageString).Groups[_versionMatchGroup].Value;
         }
+
+        public string GetFolderName() {
+            return _usetags ? _repo + "-" + GetLatestReleaseTag() : _repo + "-master";
+        }
     }
 }

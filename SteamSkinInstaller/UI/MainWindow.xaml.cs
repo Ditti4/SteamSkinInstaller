@@ -16,7 +16,7 @@ namespace SteamSkinInstaller.UI {
     /// </summary>
     public partial class MainWindow {
         internal static ClientProperties SteamClient;
-        private WindowsPrincipal _principal;
+        private static WindowsPrincipal _principal;
         private bool _online;
         private readonly Catalog _availableSkinsCatalog;
         private readonly Catalog _installedSkinsCatalog;
@@ -25,7 +25,7 @@ namespace SteamSkinInstaller.UI {
         private readonly TextBlock _noCatalogWarning;
         private readonly TextBlock _errorReadingCatalogWarning;
 
-        public bool IsAdmin() {
+        public static bool IsAdmin() {
             _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent() ?? new WindowsIdentity(""));
             return _principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
