@@ -15,7 +15,7 @@ namespace SteamSkinInstaller {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow {
-        private ClientProperties _steamClient;
+        internal static ClientProperties SteamClient;
         private WindowsPrincipal _principal;
         private bool _online;
         private readonly Catalog _availableSkinsCatalog;
@@ -55,7 +55,7 @@ namespace SteamSkinInstaller {
 
             int returncode;
 
-            _steamClient = new ClientProperties();
+            SteamClient = new ClientProperties();
 
             _availableSkinsCatalog = new Catalog("skins.xml");
 
@@ -88,7 +88,7 @@ namespace SteamSkinInstaller {
 
             SetOnlineStatus();
 
-            TextSteamLocation.Text = _steamClient.GetInstallPath();
+            TextSteamLocation.Text = SteamClient.GetInstallPath();
 
         }
 
@@ -113,8 +113,8 @@ namespace SteamSkinInstaller {
             if (steamFolder.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
             try {
                 ClientProperties newClient = new ClientProperties(steamFolder.SelectedPath);
-                _steamClient = newClient;
-                TextSteamLocation.Text = _steamClient.GetInstallPath();
+                SteamClient = newClient;
+                TextSteamLocation.Text = SteamClient.GetInstallPath();
             } catch (Exception exc) {
                 MessageBox.Show(exc.Message, "Error");
             }
