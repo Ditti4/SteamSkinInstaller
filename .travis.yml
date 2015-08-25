@@ -1,0 +1,10 @@
+language: csharp
+solution: SteamSkinInstaller.sln
+notifications:
+  email: false
+  irc:
+    channels:
+      - "chat.freenode.net#steamskininstaller"
+    on_success: change
+    on_failure: always
+    skip_join: true
