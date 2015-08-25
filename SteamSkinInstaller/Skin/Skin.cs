@@ -28,7 +28,7 @@ namespace SteamSkinInstaller.Skin {
                         break;
                     case "deviantart":
                         _downloadHandler = new DeviantArtDownload(Entry.FileDownload.DeviantURL, Entry.Name + ".zip", Entry.RemoteVersionInfo.MatchPattern,
-                            Entry.RemoteVersionInfo.MatchGroup, Entry.RemoteVersionInfo.MatchURL, Entry.FileDownload.Foldername ?? Entry.Name);
+                            Entry.RemoteVersionInfo.MatchGroup, Entry.RemoteVersionInfo.MatchURL, Entry.FileDownload.FolderName ?? Entry.Name);
                         break;
                     case "direct":
                         // TODO
@@ -39,11 +39,11 @@ namespace SteamSkinInstaller.Skin {
             }
         }
 
-        public int Install() {
+        public int Install(string installPath) {
             int result = Download();
             switch (result) {
                 case 1:
-                    // handled in the Donwload method because I'm too lazy to try and catch here
+                    // handled in the Donwload method because I'm too lazy to 'try' and 'catch' here
                     break;
                 case 2:
                     MessageBox.Show(
@@ -57,9 +57,9 @@ namespace SteamSkinInstaller.Skin {
                 return result;
             }
             if (MainWindow.IsAdmin() &&
-                (MainWindow.SteamClient.GetInstallPath().StartsWith(Environment.SpecialFolder.ProgramFiles.ToString()) ||
-                 MainWindow.SteamClient.GetInstallPath().StartsWith(Environment.SpecialFolder.ProgramFilesX86.ToString()))) {
-                result = MoveToSkinFolder();
+                (installPath.StartsWith(Environment.SpecialFolder.ProgramFiles.ToString()) ||
+                 installPath.StartsWith(Environment.SpecialFolder.ProgramFilesX86.ToString()))) {
+                result = MoveToSkinFolder(installPath);
                 if (result != 0) {
                     return result;
                 }
@@ -79,7 +79,7 @@ namespace SteamSkinInstaller.Skin {
             } catch(Exception e) {
                     MessageBox.Show(
                         "An error occured while trying to create the download handler. This shouldn't have happened and I'm sorry it did. " +
-                        "But if you want to help out, just Ctrl + C on this dialog window and create a bug report. The important stuff comes here:\n\n" +
+                        "But if you want to help out, just Ctrl + C on this dialog window and create a bug report. Here comes the important stuff:\n\n" +
                         e.Message, "Error trying to create the download handler");
             }
             _downloadHandler.GetFile();
@@ -100,10 +100,13 @@ namespace SteamSkinInstaller.Skin {
             return 0;
         }
 
-        public int MoveToSkinFolder() {
+        public int MoveToSkinFolder(string installPath) {
             try {
+                if (Directory.Exists(Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()))) {
+                    Directory.Delete(Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()), true);
+                }
                 Directory.Move(Path.Combine("Downloads", _downloadHandler.GetFolderName()),
-                    Path.Combine(MainWindow.SteamClient.GetInstallPath(), "skins", _downloadHandler.GetFolderName()));
+                    Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()));
             } catch (Exception e) {
                 MessageBox.Show(
                     "An error occured while trying to move the extracted files. This probably isn't my fault so " +
@@ -116,7 +119,7 @@ namespace SteamSkinInstaller.Skin {
         public int InstallFonts(List<CatalogEntry.ExtraInfo.Font> fontList) {
             foreach(CatalogEntry.ExtraInfo.Font font in fontList) {
                 // TODO: check if user wants to use the experimental install method (copy, add to registry, SendMessage())
-                Process.Start(font.Filename);
+                Process.Start(font.FileName);
             }
             return 0;
         }
@@ -130,9 +133,9 @@ namespace SteamSkinInstaller.Skin {
             return _downloadHandler.GetLatestVersionString();
         }
 
-        public string GetLocalVersion() {
+        public string GetLocalVersion(string installPath) {
             try {
-                string verisonFileContent = File.ReadAllText(Path.Combine(MainWindow.SteamClient.GetInstallPath(), Entry.LocalVersionInfo.MatchURL));
+                string verisonFileContent = File.ReadAllText(Path.Combine(installPath, Entry.LocalVersionInfo.MatchURL));
                 Regex versionRegex = new Regex(Entry.LocalVersionInfo.MatchPattern);
                 return versionRegex.Match(verisonFileContent).Groups[Entry.LocalVersionInfo.MatchGroup].Value;
             } catch (Exception) {

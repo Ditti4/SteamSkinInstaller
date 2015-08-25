@@ -10,7 +10,7 @@ namespace SteamSkinInstaller.Skin {
             public string GithubRepo;
             public bool GithubUseTags;
             public bool CreateFolder;
-            public string Foldername;
+            public string FolderName;
         }
 
         public class VersionInfo {
@@ -21,8 +21,8 @@ namespace SteamSkinInstaller.Skin {
 
         public class ExtraInfo {
             public class Font {
-                public string Filename;
-                public string Fontname;
+                public string FileName;
+                public string FontName;
             }
 
             public List<Font> FontList;

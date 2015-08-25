@@ -15,7 +15,7 @@ namespace SteamSkinInstaller.UI {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow {
-        internal static ClientProperties SteamClient;
+        private ClientProperties _steamClient;
         private static WindowsPrincipal _principal;
         private bool _online;
         private readonly Catalog _availableSkinsCatalog;
@@ -55,7 +55,7 @@ namespace SteamSkinInstaller.UI {
 
             int returncode;
 
-            SteamClient = new ClientProperties();
+            _steamClient = new ClientProperties();
 
             _availableSkinsCatalog = new Catalog("skins.xml");
 
@@ -88,7 +88,7 @@ namespace SteamSkinInstaller.UI {
 
             SetOnlineStatus();
 
-            TextSteamLocation.Text = SteamClient.GetInstallPath();
+            TextSteamLocation.Text = _steamClient.GetInstallPath();
 
         }
 
@@ -113,8 +113,8 @@ namespace SteamSkinInstaller.UI {
             if (steamFolder.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
             try {
                 ClientProperties newClient = new ClientProperties(steamFolder.SelectedPath);
-                SteamClient = newClient;
-                TextSteamLocation.Text = SteamClient.GetInstallPath();
+                _steamClient = newClient;
+                TextSteamLocation.Text = _steamClient.GetInstallPath();
             } catch (Exception exc) {
                 MessageBox.Show(exc.Message, "Error");
             }
@@ -194,7 +194,7 @@ namespace SteamSkinInstaller.UI {
             installButton.Click += async (sender, args) => {
                 LabelStatus.Content = "Installing " + skin.Entry.Name + ". Please wait …";
                 DisableControls();
-                switch (await (Task.Run(() => skin.Install()))) {
+                switch (await (Task.Run(() => skin.Install(_steamClient.GetInstallPath())))) {
                     case 0:
                         break;
                     // TODO: add more possible failure reasons including appropiate message boxes

@@ -1,29 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<skins xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:noNamespaceSchemaLocation="skins.xsd">
-  <skin>
-    <name>Metro for Steam</name>
-    <author>BoneyardBrew</author>
-    <description>Lorem Ipsum</description>
-    <website>http://metroforsteam.com</website>
-    <download>
-      <method>deviantart</method>
-      <devianturl>http://boneyardbrew.deviantart.com/art/Metro-for-Steam-3-9-1-292419787</devianturl>
-    </download>
-    <remoteversion>
-      <pattern>Metro for Steam - ((\d\.)*)</pattern>
-      <patterngroup>2</patterngroup>
-    </remoteversion>
-  </skin>
-  <skin>
-    <name>Pressure for Steam</name>
-    <author>DirtDiglett</author>
-    <description>Lorem Ipsum</description>
-    <website>http://hydra.tf/pressure</website>
-    <download>
-      <method>github</method>
-      <githubuser>dirtdiglett</githubuser>
-      <githubrepo>pressure-for-steam</githubrepo>
-    </download>
-  </skin>
-</skins>
+<?xml version="1.0"?>
+<ArrayOfCatalogEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <CatalogEntry>
+    <Author>BoneyardBrew</Author>
+    <Name>Metro for Steam</Name>
+    <Description>Metro for Steam brings a fresh, clean style to the platform you already know and love. This is Steam like you've never seen it before.</Description>
+    <Website>http://metroforsteam.com</Website>
+    <FileDownload>
+      <Method>deviantart</Method>
+      <DeviantURL>http://boneyardbrew.deviantart.com/art/Metro-for-Steam-292419787</DeviantURL>
+      <GithubUseTags>false</GithubUseTags>
+    </FileDownload>
+    <RemoteVersionInfo>
+      <MatchURL>http://boneyardbrew.deviantart.com/art/Metro-for-Steam-292419787</MatchURL>
+      <MatchPattern>&gt;Metro for Steam - (.*)&lt;/a&gt;</MatchPattern>
+      <MatchGroup>1</MatchGroup>
+    </RemoteVersionInfo>
+    <LocalVersionInfo>
+      <MatchURL>resource\menus\steam.menu</MatchURL>
+      <MatchPattern>text="Metro For Steam - (.*)"</MatchPattern>
+      <MatchGroup>1</MatchGroup>
+    </LocalVersionInfo>
+    <ExtraStuff>
+      <FontList />
+    </ExtraStuff>
+  </CatalogEntry>
+</ArrayOfCatalogEntry>
