@@ -31,16 +31,19 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Grid>
-                        <Border Name="Border" Margin="0" Background="#CCCCCC" BorderBrush="Transparent" BorderThickness="0" Padding="2">
+                        <Border Name="Border" Margin="0" Background="#C0C0C0" BorderBrush="Transparent" BorderThickness="0" Padding="2">
                             <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" RecognizesAccessKey="True" Margin="2"/>
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#DDDDDD"/>
+                            <Setter TargetName="Border" Property="Background" Value="#D0D0D0"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="#999999"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Border" Property="Background" Value="#DFDFDF"></Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

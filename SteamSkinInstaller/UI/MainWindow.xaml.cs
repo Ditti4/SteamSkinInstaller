@@ -53,6 +53,7 @@ namespace SteamSkinInstaller.UI {
                 }
             }
 
+
             int returncode;
 
             _steamClient = new ClientProperties();
@@ -93,6 +94,7 @@ namespace SteamSkinInstaller.UI {
         }
 
         private async void SetOnlineStatus() {
+            DisableNetworkControls();
             LabelStatus.Content = "Checking internet connection, please wait …";
             if (!await Task.Run(() => MiscTools.IsComputerOnline())) {
                 LabelStatus.Content = "Computer is not online. All online functionality will be disabled.";
@@ -102,6 +104,7 @@ namespace SteamSkinInstaller.UI {
                 _online = true;
             }
             LabelStatus.Content = "Ready.";
+            EnableNetworkControls();
         }
 
         private void ButtonSteamLocation_Click(object sender, RoutedEventArgs e) {
@@ -127,15 +130,16 @@ namespace SteamSkinInstaller.UI {
         private async void ButtonRefresh_Click(object sender, RoutedEventArgs e) {
             if (!_online) return;
             LabelStatus.Content = "Downloading newest skin catalog file …";
-            DisableControls();
+            DisableNetworkControls();
             BetterWebClient skinDownloadClient = new BetterWebClient();
             try {
                 // TODO: await skinDownloadClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Ditti4/SteamSkinInstaller/master/SteamSkinInstaller/skins.xml", "skins.xml");
+                await Task.Delay(5000);
                 LabelStatus.Content = "Ready.";
             } catch (Exception) {
                 MessageBox.Show("Something went wrong when trying to get the skin catalog file. Is GitHub offline? Did you delete the internet?", "Error getting skin catalog");
             }
-            EnableControls();
+            EnableNetworkControls();
             for (int i = StackAvailable.Children.Count - 1; i >= 0; i--) {
                 StackAvailable.Children.RemoveAt(i);
             }
@@ -158,12 +162,31 @@ namespace SteamSkinInstaller.UI {
             }
         }
 
-        private void EnableControls() {
-            // TODO
+        private void SetNetworkControlsState(bool state) {
+            foreach (StackPanel skin in StackAvailable.Children) {
+                foreach (UIElement mightBeInnerPanel in skin.Children) {
+                    if (mightBeInnerPanel is DockPanel) {
+                        foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
+                            if (mightBeButtonPanel is StackPanel) {
+                                foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeButtonPanel).Children) {
+                                    if (mightBeInstallButton is Button && (string) ((Button) mightBeInstallButton).Content == "Install") {
+                                        mightBeInstallButton.IsEnabled = state;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            ButtonRefresh.IsEnabled = state;
         }
 
-        private void DisableControls() {
-            // TODO
+        private void EnableNetworkControls() {
+            SetNetworkControlsState(true);
+        }
+
+        private void DisableNetworkControls() {
+            SetNetworkControlsState(false);
         }
 
         private StackPanel GetNewAvailableSkinFragment(Skin.Skin skin) {
@@ -193,8 +216,8 @@ namespace SteamSkinInstaller.UI {
             installButton.Margin = new Thickness(5);
             installButton.Click += async (sender, args) => {
                 LabelStatus.Content = "Installing " + skin.Entry.Name + ". Please wait …";
-                DisableControls();
-                switch (await (Task.Run(() => skin.Install(_steamClient.GetInstallPath())))) {
+                DisableNetworkControls();
+                switch (await (Task.Run(() => skin.Install(_steamClient.GetInstallPath())))) { // dem parentheses o.o
                     case 0:
                         break;
                     // TODO: add more possible failure reasons including appropiate message boxes
@@ -203,7 +226,7 @@ namespace SteamSkinInstaller.UI {
                         break;
                 }
                 LabelStatus.Content = "Ready.";
-                EnableControls();
+                EnableNetworkControls();
             };
             websiteButton.Content = "Visit website";
             websiteButton.Style = (Style) FindResource("KewlButton");

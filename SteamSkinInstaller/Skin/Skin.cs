@@ -10,13 +10,15 @@ using SteamSkinInstaller.UI;
 
 namespace SteamSkinInstaller.Skin {
     class Skin {
+        public static string DownloadFolderName = "SSIDownloads";
         private IDownload _downloadHandler;
         public readonly CatalogEntry Entry;
         private readonly string _filename;
+        private Exception _lastException;
 
         public Skin(CatalogEntry entry) {
             Entry = entry;
-            _filename = Path.Combine("Downloads", Entry.Name + ".zip");
+            _filename = Path.Combine(DownloadFolderName, Entry.Name + ".zip");
         }
 
         private void CreateDownloadHandler() {
@@ -34,41 +36,56 @@ namespace SteamSkinInstaller.Skin {
                         // TODO
                         break;
                     default:
-                        throw new Exception("Unknown download method for skin " + Entry.Name);
+                        throw new Exception("Unknown download method " + Entry.FileDownload.Method + " for skin " + Entry.Name);
                 }
             }
         }
 
         public int Install(string installPath) {
-            int result = Download();
-            switch (result) {
+            switch (Download()) {
                 case 1:
-                    // handled in the Donwload method because I'm too lazy to 'try' and 'catch' here
+                    MessageBox.Show(
+                        "Okay, here's the thing: something went horribly wrong when trying to download the skin archive. " +
+                        "This is a bug in this very tool right here. In case you do have a GitHub account, please submit a bug report at https://github.com/Ditti4/SteamSkinInstaller " +
+                        "using the following details:\n\n" + _lastException.Message,
+                        "Error trying to create the download handler");
                     break;
                 case 2:
                     MessageBox.Show(
                         "Somehow I wasn't able to download the file archive although everything looks fine. " +
-                        "Don't blame me, though, blame your missing free disk space, your boss or something else.",
+                        "Don't blame me, though, blame yourself for being low on disk space, your boss or somebody else.",
                         "Error downloading file");
                     break;
             }
-            result = Unpack();
-            if(result != 0) {
-                return result;
+            if(Unpack() != 0) {
+                MessageBox.Show(
+                    "Hrm, looks like I wasn't able to extract the skin archive. This probably ... okay, hopefully isn't my fault so " +
+                    "please make sure you have enough free disk space and try again later. Exact error message:\n\n" + _lastException.Message,
+                    "Error trying to extract the archive");
             }
-            if (MainWindow.IsAdmin() &&
+            if (Cleanup() != 0) {
+                MessageBox.Show(
+                    "Looks like something went wrong when trying to delete a few files and folders which are supposed to be deleted. " +
+                    "You shouldn't have to worry about that but if you're interested in the detailed error message " + "then here you go:\n\n" +
+                    _lastException.Message, "Error while trying to clean up");
+            }
+            if (!MainWindow.IsAdmin() &&
                 (installPath.StartsWith(Environment.SpecialFolder.ProgramFiles.ToString()) ||
                  installPath.StartsWith(Environment.SpecialFolder.ProgramFilesX86.ToString()))) {
-                result = MoveToSkinFolder(installPath);
-                if (result != 0) {
-                    return result;
-                }
-            } else {
                 MessageBox.Show(
                     "Can't automatically move the skin folder to the appropiate directory in your Steam installation " +
                     "directory because I wasn't launched using administrative privileges. You can still go ahead and " +
-                    "manually move it, it's located in the \"Downloads\" directory",
+                    "manually move it, it's located in the \"" + DownloadFolderName + "\" directory",
                     "Missing privileges to continue");
+            } else {
+                if (MoveToSkinFolder(installPath) != 0) {
+                    MessageBox.Show(
+                        "An error occured while trying to move the extracted files. This probably isn't my fault so " +
+                        "please make sure you have enough free disk space and try again later. Exact error message:\n\n" + _lastException.Message,
+                        "Error trying to move the skin folder");
+                } else {
+                    FullCleanup();
+                }
             }
             return 0;
         }
@@ -77,10 +94,8 @@ namespace SteamSkinInstaller.Skin {
             try {
                 CreateDownloadHandler();
             } catch(Exception e) {
-                    MessageBox.Show(
-                        "An error occured while trying to create the download handler. This shouldn't have happened and I'm sorry it did. " +
-                        "But if you want to help out, just Ctrl + C on this dialog window and create a bug report. Here comes the important stuff:\n\n" +
-                        e.Message, "Error trying to create the download handler");
+                _lastException = e;
+                return 1;
             }
             _downloadHandler.GetFile();
             return !File.Exists(_filename) ? 2 : 0;
@@ -89,13 +104,40 @@ namespace SteamSkinInstaller.Skin {
         public int Unpack() {
             try {
                 using (ZipArchive archive = ZipFile.OpenRead(_filename)) {
-                    archive.ExtractToDirectory(Entry.FileDownload.CreateFolder ? Path.Combine("Downloads", Entry.Name) : "Downloads");
+                    foreach (ZipArchiveEntry entry in archive.Entries) {
+                        string fullname = Entry.FileDownload.CreateFolder
+                            ? Path.Combine(DownloadFolderName, Entry.Name, entry.FullName)
+                            : Path.Combine(DownloadFolderName, entry.FullName);
+                        if (File.Exists(fullname)) {
+                            File.Delete(fullname);
+                        } else if (Directory.Exists(fullname)) {
+                            Directory.Delete(fullname, true);
+                        }
+                    }
+                    archive.ExtractToDirectory(Entry.FileDownload.CreateFolder ? Path.Combine(DownloadFolderName, Entry.Name) : DownloadFolderName);
                 }
             } catch (Exception e) {
-                MessageBox.Show(
-                    "An error occured while trying to extract the downloaded archive. This probably isn't my fault so " +
-                    "please make sure you have enough free disk space and try again later. Exact error message:\n\n" + e.Message,
-                    "Error trying to extract the archive");
+                _lastException = e;
+                return 1;
+            }
+            return 0;
+        }
+
+        public int Cleanup() {
+            try {
+                foreach (string fileName in Entry.ExtraStuff.FilesToDelete) {
+                    if (File.Exists(fileName)) {
+                        File.Delete(fileName);
+                    }
+                }
+                foreach (string folderName in Entry.ExtraStuff.FoldersToDelete) {
+                    if (Directory.Exists(folderName)) {
+                        Directory.Delete(folderName, true);
+                    }
+                }
+            } catch (Exception e) {
+                _lastException = e;
+                return 1;
             }
             return 0;
         }
@@ -105,13 +147,11 @@ namespace SteamSkinInstaller.Skin {
                 if (Directory.Exists(Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()))) {
                     Directory.Delete(Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()), true);
                 }
-                Directory.Move(Path.Combine("Downloads", _downloadHandler.GetFolderName()),
+                Microsoft.VisualBasic.FileIO.FileSystem.MoveDirectory(Path.Combine(DownloadFolderName, _downloadHandler.GetFolderName()),
                     Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()));
             } catch (Exception e) {
-                MessageBox.Show(
-                    "An error occured while trying to move the extracted files. This probably isn't my fault so " +
-                    "please make sure you have enough free disk space and try again later. Exact error message:\n\n" + e.Message,
-                    "Error trying to move the skin folder");
+                _lastException = e;
+                return 1;
             }
             return 0;
         }
@@ -120,6 +160,27 @@ namespace SteamSkinInstaller.Skin {
             foreach(CatalogEntry.ExtraInfo.Font font in fontList) {
                 // TODO: check if user wants to use the experimental install method (copy, add to registry, SendMessage())
                 Process.Start(font.FileName);
+            }
+            return 0;
+        }
+
+        public int FullCleanup() {
+            try {
+                using(ZipArchive archive = ZipFile.OpenRead(_filename)) {
+                    foreach(ZipArchiveEntry entry in archive.Entries) {
+                        string fullname = Entry.FileDownload.CreateFolder
+                            ? Path.Combine(DownloadFolderName, Entry.Name, entry.FullName)
+                            : Path.Combine(DownloadFolderName, entry.FullName);
+                        if(File.Exists(fullname)) {
+                            File.Delete(fullname);
+                        } else if(Directory.Exists(fullname)) {
+                            Directory.Delete(fullname, true);
+                        }
+                    }
+                }
+            } catch(Exception e) {
+                _lastException = e;
+                return 1;
             }
             return 0;
         }

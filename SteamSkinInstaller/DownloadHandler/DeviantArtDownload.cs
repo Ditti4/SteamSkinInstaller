@@ -14,11 +14,11 @@ namespace SteamSkinInstaller.DownloadHandler {
         private readonly int _versionMatchGroup;
         private readonly string _versionRegexPattern;
         private readonly string _versionMatchURL;
-        private readonly string _foldername;
+        private readonly string _folderName;
         private string _versionPageString;
 
         public DeviantArtDownload(string url, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null,
-            string foldername = null, bool overwrite = false) {
+            string folderName = null, bool overwrite = false) {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(filename) || string.IsNullOrEmpty(versionRegexPattern)) {
                 throw new Exception("None of the parameters can be empty");
             }
@@ -32,25 +32,25 @@ namespace SteamSkinInstaller.DownloadHandler {
             _versionRegexPattern = versionRegexPattern;
             _versionMatchGroup = versionMatchGroup;
             _versionMatchURL = versionMatchURL;
-            _foldername = foldername;
+            _folderName = folderName;
         }
 
         public void GetFile() {
-            if (!Directory.Exists("Downloads")) {
-                Directory.CreateDirectory("Downloads");
+            if (!Directory.Exists(Skin.Skin.DownloadFolderName)) {
+                Directory.CreateDirectory(Skin.Skin.DownloadFolderName);
             }
             if (string.IsNullOrEmpty(_deviantPageString)) {
                 if (!FetchDeviantArtPage()) {
                     throw new Exception("Couldn't fetch the DeviantArt page of this item");
                 }
             }
-            if (File.Exists(Path.Combine("Downloads", _filename)) && !_overwrite) {
+            if (File.Exists(Path.Combine(Skin.Skin.DownloadFolderName, _filename)) && !_overwrite) {
                 return;
             }
             Regex downloadLinkRegex = new Regex(@"""(http://www\.deviantart\.com/download/\d*/.*)""");
             string downloadUrl = downloadLinkRegex.Match(_deviantPageString).Groups[1].Value.Replace("&amp;", "&");
             BetterWebClient downloadClient = new BetterWebClient(_cookieContainer, _url);
-            downloadClient.DownloadFile(downloadUrl, Path.Combine("Downloads", _filename));
+            downloadClient.DownloadFile(downloadUrl, Path.Combine(Skin.Skin.DownloadFolderName, _filename));
         }
 
         public bool FetchDeviantArtPage() {
@@ -79,7 +79,7 @@ namespace SteamSkinInstaller.DownloadHandler {
         }
 
         public string GetFolderName() {
-            return _foldername;
+            return _folderName;
         }
     }
 }

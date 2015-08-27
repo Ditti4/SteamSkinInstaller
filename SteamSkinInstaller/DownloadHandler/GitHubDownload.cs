@@ -35,24 +35,24 @@ namespace SteamSkinInstaller.DownloadHandler {
 
         public void GetMasterZip() {
             BetterWebClient downloadClient = new BetterWebClient();
-            if (!Directory.Exists("Downloads")) {
-                Directory.CreateDirectory("Downloads");
+            if (!Directory.Exists(Skin.Skin.DownloadFolderName)) {
+                Directory.CreateDirectory(Skin.Skin.DownloadFolderName);
             }
-            if (!File.Exists(Path.Combine("Downloads", _filename)) || _overwrite) {
-                downloadClient.DownloadFile(GithubBaseURL + _user + "/" + _repo + "/archive/master.zip", Path.Combine("Downloads", _filename));
+            if (!File.Exists(Path.Combine(Skin.Skin.DownloadFolderName, _filename)) || _overwrite) {
+                downloadClient.DownloadFile(GithubBaseURL + _user + "/" + _repo + "/archive/master.zip", Path.Combine(Skin.Skin.DownloadFolderName, _filename));
             }
         }
 
         public void GetLatestReleaseZip() {
             BetterWebClient downloadClient = new BetterWebClient();
-            if (!Directory.Exists("Downloads")) {
-                Directory.CreateDirectory("Downloads");
+            if (!Directory.Exists(Skin.Skin.DownloadFolderName)) {
+                Directory.CreateDirectory(Skin.Skin.DownloadFolderName);
             }
             if (string.IsNullOrEmpty(_latestTag)) {
                 GetLatestReleaseTag();
             }
-            if (!File.Exists(Path.Combine("Downloads", _filename)) || _overwrite) {
-                downloadClient.DownloadFile(GithubAPIRepoBaseURL + _user + "/" + _repo + "/zipball/" + _latestTag, Path.Combine("Downloads", _filename));
+            if (!File.Exists(Path.Combine(Skin.Skin.DownloadFolderName, _filename)) || _overwrite) {
+                downloadClient.DownloadFile(GithubAPIRepoBaseURL + _user + "/" + _repo + "/zipball/" + _latestTag, Path.Combine(Skin.Skin.DownloadFolderName, _filename));
             }
         }
 
