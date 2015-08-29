@@ -63,7 +63,7 @@ namespace SteamSkinInstaller.Skin {
                     "please make sure you have enough free disk space and try again later. Exact error message:\n\n" + _lastException.Message,
                     "Error trying to extract the archive");
             }
-            if (Cleanup() != 0) {
+            if (CleanupOnInstall() != 0) {
                 MessageBox.Show(
                     "Looks like something went wrong when trying to delete a few files and folders which are supposed to be deleted. " +
                     "You shouldn't have to worry about that but if you're interested in the detailed error message " + "then here you go:\n\n" +
@@ -123,14 +123,14 @@ namespace SteamSkinInstaller.Skin {
             return 0;
         }
 
-        public int Cleanup() {
+        public int CleanupOnInstall() {
             try {
-                foreach (string fileName in Entry.ExtraStuff.FilesToDelete) {
+                foreach (string fileName in Entry.ExtraStuff.FilesToDeleteOnInstall) {
                     if (File.Exists(fileName)) {
                         File.Delete(fileName);
                     }
                 }
-                foreach (string folderName in Entry.ExtraStuff.FoldersToDelete) {
+                foreach (string folderName in Entry.ExtraStuff.FoldersToDeleteOnInstall) {
                     if (Directory.Exists(folderName)) {
                         Directory.Delete(folderName, true);
                     }
@@ -142,13 +142,29 @@ namespace SteamSkinInstaller.Skin {
             return 0;
         }
 
+        public int CleanupOnUpdate() {
+            try {
+                foreach(string fileName in Entry.ExtraStuff.FilesToDeleteOnUpdate) {
+                    if(File.Exists(fileName)) {
+                        File.Delete(fileName);
+                    }
+                }
+                foreach(string folderName in Entry.ExtraStuff.FoldersToDeleteOnUpdate) {
+                    if(Directory.Exists(folderName)) {
+                        Directory.Delete(folderName, true);
+                    }
+                }
+            } catch(Exception e) {
+                _lastException = e;
+                return 1;
+            }
+            return 0;
+        }
+
         public int MoveToSkinFolder(string installPath) {
             try {
-                if (Directory.Exists(Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()))) {
-                    Directory.Delete(Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()), true);
-                }
                 Microsoft.VisualBasic.FileIO.FileSystem.MoveDirectory(Path.Combine(DownloadFolderName, _downloadHandler.GetFolderName()),
-                    Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()));
+                    Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()), true);
             } catch (Exception e) {
                 _lastException = e;
                 return 1;

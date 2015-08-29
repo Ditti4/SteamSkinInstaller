@@ -26,8 +26,10 @@ namespace SteamSkinInstaller.Skin {
             }
 
             public List<Font> FontList;
-            public List<string> FoldersToDelete;
-            public List<string> FilesToDelete;
+            public List<string> FoldersToDeleteOnInstall;
+            public List<string> FilesToDeleteOnInstall;
+            public List<string> FoldersToDeleteOnUpdate;
+            public List<string> FilesToDeleteOnUpdate;
         }
 
         public string Author;
