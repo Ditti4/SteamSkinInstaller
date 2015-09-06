@@ -19,9 +19,9 @@ namespace SteamSkinInstaller.UI {
         private static WindowsPrincipal _principal;
         private bool _online;
         private readonly Catalog _availableSkinsCatalog;
-        private readonly Catalog _installedSkinsCatalog;
+        //private readonly Catalog _installedSkinsCatalog;
         private List<Skin.Skin> _availableSkins;
-        private List<Skin.Skin> _installedSkins;
+        //private List<Skin.Skin> _installedSkins;
         private readonly TextBlock _noCatalogWarning;
         private readonly TextBlock _errorReadingCatalogWarning;
 
@@ -47,8 +47,8 @@ namespace SteamSkinInstaller.UI {
                         Close();
                     } catch (Exception) {
                         // user denied the UAC request so we're falling back to non-elevated mode
-                        // note: this'll disable stuff like installing skins when Steam is
-                        // installed in C:\Program Files or something similar
+                        // this will disable the experimental font installation and the "let me
+                        // change the skin for you" thingy
                     }
                 }
             }
@@ -90,7 +90,6 @@ namespace SteamSkinInstaller.UI {
             SetOnlineStatus();
 
             TextSteamLocation.Text = _steamClient.GetInstallPath();
-
         }
 
         private async void SetOnlineStatus() {
@@ -131,7 +130,7 @@ namespace SteamSkinInstaller.UI {
             if (!_online) return;
             LabelStatus.Content = "Downloading newest skin catalog file …";
             DisableNetworkControls();
-            BetterWebClient skinDownloadClient = new BetterWebClient();
+            //BetterWebClient skinDownloadClient = new BetterWebClient();
             try {
                 // TODO: await skinDownloadClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Ditti4/SteamSkinInstaller/master/SteamSkinInstaller/skins.xml", "skins.xml");
                 await Task.Delay(5000);
@@ -217,14 +216,7 @@ namespace SteamSkinInstaller.UI {
             installButton.Click += async (sender, args) => {
                 LabelStatus.Content = "Installing " + skin.Entry.Name + ". Please wait …";
                 DisableNetworkControls();
-                switch (await (Task.Run(() => skin.Install(_steamClient.GetInstallPath())))) { // dem parentheses o.o
-                    case 0:
-                        break;
-                    // TODO: add more possible failure reasons including appropiate message boxes
-                    default:
-                        MessageBox.Show("Something went wrong when trying to install " + skin.Entry.Name + ".", "Error installing skin");
-                        break;
-                }
+                await (Task.Run(() => skin.Install(_steamClient.GetInstallPath())));
                 LabelStatus.Content = "Ready.";
                 EnableNetworkControls();
             };
@@ -251,6 +243,10 @@ namespace SteamSkinInstaller.UI {
             outerSkinPanel.Children.Add(innerSkinPanel);
 
             return outerSkinPanel;
+        }
+
+        private void ButtonAbout_Click(object sender, RoutedEventArgs e) {
+
         }
     }
 }

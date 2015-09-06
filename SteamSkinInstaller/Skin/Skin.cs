@@ -69,23 +69,14 @@ namespace SteamSkinInstaller.Skin {
                     "You shouldn't have to worry about that but if you're interested in the detailed error message " + "then here you go:\n\n" +
                     _lastException.Message, "Error while trying to clean up");
             }
-            if (!MainWindow.IsAdmin() &&
-                (installPath.StartsWith(Environment.SpecialFolder.ProgramFiles.ToString()) ||
-                 installPath.StartsWith(Environment.SpecialFolder.ProgramFilesX86.ToString()))) {
+            if (MoveToSkinFolder(installPath) != 0) {
                 MessageBox.Show(
-                    "Can't automatically move the skin folder to the appropiate directory in your Steam installation " +
-                    "directory because I wasn't launched using administrative privileges. You can still go ahead and " +
-                    "manually move it, it's located in the \"" + DownloadFolderName + "\" directory",
-                    "Missing privileges to continue");
+                    "An error occured while trying to move the extracted files. This probably isn't my fault so " +
+                    "please make sure you have enough free disk space and try again later. Exact error message:\n\n" +
+                    _lastException.Message,
+                    "Error trying to move the skin folder");
             } else {
-                if (MoveToSkinFolder(installPath) != 0) {
-                    MessageBox.Show(
-                        "An error occured while trying to move the extracted files. This probably isn't my fault so " +
-                        "please make sure you have enough free disk space and try again later. Exact error message:\n\n" + _lastException.Message,
-                        "Error trying to move the skin folder");
-                } else {
-                    FullCleanup();
-                }
+                FullCleanup();
             }
             return 0;
         }
@@ -164,7 +155,7 @@ namespace SteamSkinInstaller.Skin {
         public int MoveToSkinFolder(string installPath) {
             try {
                 Microsoft.VisualBasic.FileIO.FileSystem.MoveDirectory(Path.Combine(DownloadFolderName, _downloadHandler.GetFolderName()),
-                    Path.Combine(installPath, "skins", _downloadHandler.GetFolderName()), true);
+                    Path.Combine(installPath, "skins", Entry.Name), true);
             } catch (Exception e) {
                 _lastException = e;
                 return 1;
@@ -194,6 +185,7 @@ namespace SteamSkinInstaller.Skin {
                         }
                     }
                 }
+                File.Delete(_filename);
             } catch(Exception e) {
                 _lastException = e;
                 return 1;
