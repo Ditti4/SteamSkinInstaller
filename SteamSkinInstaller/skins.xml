@@ -9,6 +9,7 @@
       <Method>deviantart</Method>
       <DeviantURL>http://boneyardbrew.deviantart.com/art/Metro-for-Steam-292419787</DeviantURL>
       <GithubUseTags>false</GithubUseTags>
+      <CreateFolder>false</CreateFolder>
     </FileDownload>
     <RemoteVersionInfo>
       <MatchURL>http://boneyardbrew.deviantart.com/art/Metro-for-Steam-292419787</MatchURL>
@@ -22,6 +23,38 @@
     </LocalVersionInfo>
     <ExtraStuff>
       <FontList />
+      <FoldersToDeleteOnInstall />
+      <FilesToDeleteOnInstall />
+      <FoldersToDeleteOnUpdate />
+      <FilesToDeleteOnUpdate />
+    </ExtraStuff>
+  </CatalogEntry>
+  <CatalogEntry>
+    <Author>Dirt Diglett</Author>
+    <Name>Pressure for Steam</Name>
+    <Description>Pressure is a blend of beauty and function. Every part of Steam has been carefully considered and reworked to create the most fluid and wonderful experience possible.</Description>
+    <Website>http://www.hydra.tf/pressure/</Website>
+    <FileDownload>
+      <Method>github</Method>
+      <GithubUser>DirtDiglett</GithubUser>
+      <GithubRepo>Pressure-for-Steam</GithubRepo>
+      <GithubUseTags>false</GithubUseTags>
+      <CreateFolder>false</CreateFolder>
+    </FileDownload>
+    <RemoteVersionInfo>
+      <MatchURL>https://raw.githubusercontent.com/DirtDiglett/Pressure-for-Steam/master/resource/menus/steam.menu</MatchURL>
+      <MatchPattern>text="Pressure v(.*)"</MatchPattern>
+      <MatchGroup>1</MatchGroup>
+    </RemoteVersionInfo>
+    <LocalVersionInfo>
+      <MatchURL>resource\menus\steam.menu</MatchURL>
+      <MatchPattern>text="Pressure v(.*)"</MatchPattern>
+      <MatchGroup>1</MatchGroup>
+    </LocalVersionInfo>
+    <ExtraStuff>
+      <FontList />
+      <FoldersToDeleteOnInstall />
+      <FilesToDeleteOnInstall />
     </ExtraStuff>
   </CatalogEntry>
 </ArrayOfCatalogEntry>
