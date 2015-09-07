@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <Style x:Key="KewlTabItem" TargetType="{x:Type TabItem}">
-        <Setter Property="Template"> <!-- TODO: check if normal style triggers would be enough -->
+        <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
                     <Grid>

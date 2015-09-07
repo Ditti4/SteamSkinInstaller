@@ -6,7 +6,6 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Windows;
 using SteamSkinInstaller.DownloadHandler;
-using SteamSkinInstaller.UI;
 
 namespace SteamSkinInstaller.Skin {
     class Skin {
@@ -36,7 +35,7 @@ namespace SteamSkinInstaller.Skin {
                         // TODO
                         break;
                     default:
-                        throw new Exception("Unknown download method " + Entry.FileDownload.Method + " for skin " + Entry.Name);
+                        throw new Exception("Unknown download method " + Entry.FileDownload.Method + " for skin " + Entry.Name + ".");
                 }
             }
         }

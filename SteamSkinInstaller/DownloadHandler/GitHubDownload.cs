@@ -21,7 +21,7 @@ namespace SteamSkinInstaller.DownloadHandler {
         public GitHubDownload(string user, string repo, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null,
             bool overwrite = false, bool usetags = false) {
             if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(repo) || string.IsNullOrEmpty(filename)) {
-                throw new Exception("None of the parameters can be empty");
+                throw new Exception("None of the parameters can be empty.");
             }
             _user = user;
             _repo = repo;

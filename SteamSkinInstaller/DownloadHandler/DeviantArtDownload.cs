@@ -20,11 +20,11 @@ namespace SteamSkinInstaller.DownloadHandler {
         public DeviantArtDownload(string url, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null,
             string folderName = null, bool overwrite = false) {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(filename) || string.IsNullOrEmpty(versionRegexPattern)) {
-                throw new Exception("None of the parameters can be empty");
+                throw new Exception("None of the parameters can be empty.");
             }
             Regex urlRegex = new Regex(@"^(http|https)://[\d\w]*\.deviantart.com/.*");
             if (!urlRegex.IsMatch(url)) {
-                throw new Exception("Invalid DeviantArt URL");
+                throw new Exception("Invalid DeviantArt URL.");
             }
             _url = url;
             _filename = filename;
@@ -41,7 +41,7 @@ namespace SteamSkinInstaller.DownloadHandler {
             }
             if (string.IsNullOrEmpty(_deviantPageString)) {
                 if (!FetchDeviantArtPage()) {
-                    throw new Exception("Couldn't fetch the DeviantArt page of this item");
+                    throw new Exception("Couldn't fetch the DeviantArt page of this item.");
                 }
             }
             if (File.Exists(Path.Combine(Skin.Skin.DownloadFolderName, _filename)) && !_overwrite) {
@@ -66,7 +66,7 @@ namespace SteamSkinInstaller.DownloadHandler {
             if (string.IsNullOrEmpty(_versionMatchURL) || _versionMatchURL == _url) {
                 if (string.IsNullOrEmpty(_deviantPageString)) {
                     if (!FetchDeviantArtPage()) {
-                        throw new Exception("Couldn't fetch the DeviantArt page of this item");
+                        throw new Exception("Couldn't fetch the DeviantArt page of this item.");
                     }
                 }
                 return versionRegex.Match(_deviantPageString).Groups[_versionMatchGroup].Value;

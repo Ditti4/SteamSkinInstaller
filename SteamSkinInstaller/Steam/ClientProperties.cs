@@ -14,13 +14,17 @@ namespace SteamSkinInstaller.Steam {
             _installPath =
                 (string)
                     Microsoft.Win32.Registry.GetValue(
-                        @"HKEY_LOCAL_MACHINE\SOFTWARE\" + ((Environment.Is64BitOperatingSystem) ? "Wow6432Node" : "") + @"\Valve\Steam", "InstallPath",
-                        Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
+                        @"HKEY_LOCAL_MACHINE\SOFTWARE\" + ((Environment.Is64BitOperatingSystem) ? "Wow6432Node" : "") +
+                        @"\Valve\Steam", "InstallPath", null) ??
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             _exePath = Path.Combine(_installPath, "Steam.exe");
             if (!File.Exists(_exePath)) {
                 _installPath = null;
                 _exePath = null;
-                throw new Exception("Steam is not installed");
+                throw new Exception(
+                    "Steam doesn't seem to be installed or is installed in a very, very non-standard path. " +
+                    "You may, however, specify your own Steam installation location in the settings. " +
+                    "You will not be able to install skins until this is fixed. This is done for your own safety.");
             }
             _skin = (string) Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam", "SkinV4", null);
             if (File.Exists(Path.Combine(_installPath, "package", "beta"))) {
@@ -31,7 +35,7 @@ namespace SteamSkinInstaller.Steam {
         public ClientProperties(string installPath) {
             if(!File.Exists(Path.Combine(installPath, "Steam.exe"))) {
                 _installPath = null;
-                throw new Exception("Invalid Steam install path");
+                throw new Exception("Invalid Steam install path.");
             }
             _installPath = installPath;
             _exePath = Path.Combine(installPath, "Steam.exe");

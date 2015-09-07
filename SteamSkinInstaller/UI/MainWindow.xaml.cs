@@ -18,6 +18,7 @@ namespace SteamSkinInstaller.UI {
         private ClientProperties _steamClient;
         private static WindowsPrincipal _principal;
         private bool _online;
+        private bool _lockInstallControlState;
         private readonly Catalog _availableSkinsCatalog;
         //private readonly Catalog _installedSkinsCatalog;
         private List<Skin.Skin> _availableSkins;
@@ -32,12 +33,13 @@ namespace SteamSkinInstaller.UI {
 
         public MainWindow() {
             InitializeComponent();
+
             Left = (SystemParameters.PrimaryScreenWidth/2) - (Width/2);
             Top = (SystemParameters.PrimaryScreenHeight/2) - (Height/2);
-            if (Environment.OSVersion.Version.Major >= 6 && ! IsAdmin()) {
+            if (Environment.OSVersion.Version.Major >= 6 && !IsAdmin()) {
                 NotAdminDialog notAdminDialog = new NotAdminDialog();
                 notAdminDialog.ShowDialog();
-                if(notAdminDialog.DialogResult.HasValue && notAdminDialog.DialogResult.Value) {
+                if (notAdminDialog.DialogResult.HasValue && notAdminDialog.DialogResult.Value) {
                     ProcessStartInfo restartProgramInfo = new ProcessStartInfo {
                         FileName = Assembly.GetEntryAssembly().CodeBase,
                         Verb = "runas"
@@ -56,8 +58,6 @@ namespace SteamSkinInstaller.UI {
 
             int returncode;
 
-            _steamClient = new ClientProperties();
-
             _availableSkinsCatalog = new Catalog("skins.xml");
 
             _noCatalogWarning = new TextBlock {
@@ -66,7 +66,8 @@ namespace SteamSkinInstaller.UI {
                 TextWrapping = TextWrapping.WrapWithOverflow
             };
             _errorReadingCatalogWarning = new TextBlock {
-                Text = "Error while trying to read the skin catalog file. You should try redownloading it in the top right corner.",
+                Text =
+                    "Error while trying to read the skin catalog file. You should try redownloading it in the top right corner.",
                 Margin = new Thickness(10),
                 TextWrapping = TextWrapping.WrapWithOverflow
             };
@@ -87,9 +88,16 @@ namespace SteamSkinInstaller.UI {
                     break;
             }
 
-            SetOnlineStatus();
+            try {
+                _steamClient = new ClientProperties();
+                TextSteamLocation.Text = _steamClient.GetInstallPath();
+            } catch(Exception e) {
+                MessageBox.Show(e.Message, "Error while trying to find your Stem installation");
+                DisableInstallControls();
+                _lockInstallControlState = true;
+            }
 
-            TextSteamLocation.Text = _steamClient.GetInstallPath();
+            SetOnlineStatus();
         }
 
         private async void SetOnlineStatus() {
@@ -117,6 +125,8 @@ namespace SteamSkinInstaller.UI {
                 ClientProperties newClient = new ClientProperties(steamFolder.SelectedPath);
                 _steamClient = newClient;
                 TextSteamLocation.Text = _steamClient.GetInstallPath();
+                _lockInstallControlState = false;
+                EnableInstallControls();
             } catch (Exception exc) {
                 MessageBox.Show(exc.Message, "Error");
             }
@@ -161,14 +171,17 @@ namespace SteamSkinInstaller.UI {
             }
         }
 
-        private void SetNetworkControlsState(bool state) {
-            foreach (StackPanel skin in StackAvailable.Children) {
-                foreach (UIElement mightBeInnerPanel in skin.Children) {
-                    if (mightBeInnerPanel is DockPanel) {
-                        foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
-                            if (mightBeButtonPanel is StackPanel) {
-                                foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeButtonPanel).Children) {
-                                    if (mightBeInstallButton is Button && (string) ((Button) mightBeInstallButton).Content == "Install") {
+        private void SetInstallControlsState(bool state) {
+            if(_lockInstallControlState) {
+                return;
+            }
+            foreach(StackPanel skin in StackAvailable.Children) {
+                foreach(UIElement mightBeInnerPanel in skin.Children) {
+                    if(mightBeInnerPanel is DockPanel) {
+                        foreach(UIElement mightBeButtonPanel in ((DockPanel)mightBeInnerPanel).Children) {
+                            if(mightBeButtonPanel is StackPanel) {
+                                foreach(UIElement mightBeInstallButton in ((StackPanel)mightBeButtonPanel).Children) {
+                                    if(mightBeInstallButton is Button && (string)((Button)mightBeInstallButton).Content == "Install") {
                                         mightBeInstallButton.IsEnabled = state;
                                     }
                                 }
@@ -177,6 +190,18 @@ namespace SteamSkinInstaller.UI {
                     }
                 }
             }
+        }
+
+        private void EnableInstallControls() {
+            SetInstallControlsState(true);
+        }
+
+        private void DisableInstallControls() {
+            SetInstallControlsState(false);
+        }
+
+        private void SetNetworkControlsState(bool state) {
+            SetInstallControlsState(state);
             ButtonRefresh.IsEnabled = state;
         }
 

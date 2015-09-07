@@ -5,7 +5,6 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using SteamSkinInstaller.DownloadHandler;
 
 namespace SteamSkinInstaller.Util {
     static class MiscTools {

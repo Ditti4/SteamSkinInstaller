@@ -29,6 +29,7 @@
                     <Button Content="Reset" HorizontalAlignment="Right" Margin="15" VerticalAlignment="Bottom" Style="{DynamicResource KewlButton}"/>
                     <Button Content="Save to config" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="120,15" Style="{DynamicResource KewlButton}"/>
                     <CheckBox Content="Restart Steam after applying a new skin" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top"/>
+                    <Button Name="ButtonAbout" Content="About …" HorizontalAlignment="Left" Margin="10,0,0,15" VerticalAlignment="Bottom" Width="75" Style="{DynamicResource KewlButton}" Click="ButtonAbout_Click"/>
                 </Grid>
             </TabItem>
         </TabControl>
