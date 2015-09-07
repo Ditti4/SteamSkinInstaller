@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -32,6 +33,24 @@ namespace SteamSkinInstaller.UI {
         }
 
         public MainWindow() {
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+                try {
+                    MessageBox.Show("Caught an unhandled exception. This should never ever happen " +
+                                    "so please report this using the GitHub issue tracker. " +
+                                    "Just attach the ssi.log file in the directory where I'm located and " +
+                                    "you should be good to go. Thanks in advance.", "Uh-oh");
+                    using (StreamWriter logfile = new StreamWriter("ssi.log")) {
+                        logfile.WriteLine("Unhandled exception at {0}: {1}", DateTime.Now,
+                            ((Exception) e.ExceptionObject).ToString());
+                    }
+                } catch {
+                    // So, uhm, yeah … we're screwed. Time to panic \o/
+                    MessageBox.Show(
+                        "Caught an exception while trying to handle another unhandled exception. " +
+                        "I'm really sorry (this is the point where you may want to panic).", "What the …");
+                }
+            };
+
             InitializeComponent();
 
             Left = (SystemParameters.PrimaryScreenWidth/2) - (Width/2);
