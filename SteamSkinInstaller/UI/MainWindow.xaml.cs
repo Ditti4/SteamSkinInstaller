@@ -7,6 +7,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using SteamSkinInstaller.Skin;
 using SteamSkinInstaller.Steam;
 using SteamSkinInstaller.Util;
@@ -19,13 +20,16 @@ namespace SteamSkinInstaller.UI {
         private ClientProperties _steamClient;
         private static WindowsPrincipal _principal;
         private bool _online;
-        private bool _lockInstallControlState;
+        private bool _lockInstallControlsState;
+        private bool _lockUpdateControlsState;
         private readonly Catalog _availableSkinsCatalog;
-        //private readonly Catalog _installedSkinsCatalog;
+        private Catalog _installedSkinsCatalog;
         private List<Skin.Skin> _availableSkins;
-        //private List<Skin.Skin> _installedSkins;
+        private List<Skin.Skin> _installedSkins;
         private readonly TextBlock _noCatalogWarning;
+        private readonly TextBlock _noInstalledCatalogWarning;
         private readonly TextBlock _errorReadingCatalogWarning;
+        private readonly TextBlock _errorReadingInstalledCatalogWarning;
 
         public static bool IsAdmin() {
             _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent() ?? new WindowsIdentity(""));
@@ -74,13 +78,24 @@ namespace SteamSkinInstaller.UI {
                 }
             }
 
+            bool invalidSteamLocation = false;
 
-            int returncode;
+            try {
+                _steamClient = new ClientProperties();
+                TextSteamLocation.Text = _steamClient.GetInstallPath();
+            } catch (Exception e) {
+                MessageBox.Show(e.Message, "Error while trying to find your Stem installation");
+                invalidSteamLocation = true;
+            }
 
-            _availableSkinsCatalog = new Catalog("skins.xml");
 
             _noCatalogWarning = new TextBlock {
                 Text = "Skin catalog file not found. Try clicking the button in the top right corner.",
+                Margin = new Thickness(10),
+                TextWrapping = TextWrapping.WrapWithOverflow
+            };
+            _noInstalledCatalogWarning = new TextBlock {
+                Text = "Looks like you don't have any skin installed. Head over to the first tab and install one.",
                 Margin = new Thickness(10),
                 TextWrapping = TextWrapping.WrapWithOverflow
             };
@@ -90,6 +105,37 @@ namespace SteamSkinInstaller.UI {
                 Margin = new Thickness(10),
                 TextWrapping = TextWrapping.WrapWithOverflow
             };
+            _errorReadingInstalledCatalogWarning = new TextBlock {
+                Text =
+                    "Error while trying to read the skin catalog file. Try deleting it (located in " +
+                    Path.Combine(_steamClient.GetInstallPath(), "skins", "skins.xml") + ") and hope the best",
+                Margin = new Thickness(10),
+                TextWrapping = TextWrapping.WrapWithOverflow
+            };
+            TextBlock invalidSteamLocationWarning = new TextBlock {
+                Text =
+                    "Couldn't find Steam and, thus, couldn't find any installed skins. You should try to fix this by going " +
+                    "to the settings and selecting your current Steam installation folder.",
+                Margin = new Thickness(10),
+                TextWrapping = TextWrapping.WrapWithOverflow
+            };
+
+            _availableSkinsCatalog = new Catalog("skins.xml");
+            RebuildAvailableTab();
+
+            if (invalidSteamLocation) {
+                StackInstalled.Children.Add(invalidSteamLocationWarning);
+                DisableInstallControls();
+                _lockInstallControlsState = true;
+            } else {
+                RebuildInstalledTab();
+            }
+
+            SetOnlineStatus();
+        }
+
+        private void RebuildAvailableTab() {
+            int returncode;
 
             _availableSkins = _availableSkinsCatalog.GetSkins(out returncode);
 
@@ -106,17 +152,31 @@ namespace SteamSkinInstaller.UI {
                     StackAvailable.Children.Add(_errorReadingCatalogWarning);
                     break;
             }
+        }
 
-            try {
-                _steamClient = new ClientProperties();
-                TextSteamLocation.Text = _steamClient.GetInstallPath();
-            } catch(Exception e) {
-                MessageBox.Show(e.Message, "Error while trying to find your Stem installation");
-                DisableInstallControls();
-                _lockInstallControlState = true;
+        private void RebuildInstalledTab() {
+            for (int i = StackInstalled.Children.Count - 1; i >= 0; i--) {
+                StackInstalled.Children.RemoveAt(i);
             }
 
-            SetOnlineStatus();
+            int returncode;
+
+            _installedSkinsCatalog = new Catalog(Path.Combine(_steamClient.GetInstallPath(), "skins", "skins.xml"));
+            _installedSkins = _installedSkinsCatalog.GetSkins(out returncode);
+
+            switch (returncode) {
+                case 0:
+                    foreach (Skin.Skin skin in _installedSkins) {
+                        StackInstalled.Children.Add(GetNewInstalledSkinFragment(skin));
+                    }
+                    break;
+                case 1:
+                    StackInstalled.Children.Add(_noInstalledCatalogWarning);
+                    break;
+                case 2:
+                    StackInstalled.Children.Add(_errorReadingInstalledCatalogWarning);
+                    break;
+            }
         }
 
         private async void SetOnlineStatus() {
@@ -139,24 +199,32 @@ namespace SteamSkinInstaller.UI {
                 SelectedPath = TextSteamLocation.Text,
                 ShowNewFolderButton = false
             };
-            if (steamFolder.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+            if (steamFolder.ShowDialog() != System.Windows.Forms.DialogResult.OK) {
+                return;
+            }
             try {
                 ClientProperties newClient = new ClientProperties(steamFolder.SelectedPath);
                 _steamClient = newClient;
                 TextSteamLocation.Text = _steamClient.GetInstallPath();
-                _lockInstallControlState = false;
+                _lockInstallControlsState = false;
                 EnableInstallControls();
+
+                RebuildInstalledTab();
             } catch (Exception exc) {
                 MessageBox.Show(exc.Message, "Error");
             }
         }
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            ButtonRefresh.Visibility = TabSettings.Equals(((TabControl) sender).SelectedItem) ? Visibility.Hidden : Visibility.Visible;
+            ButtonRefresh.Visibility = TabSettings.Equals(((TabControl) sender).SelectedItem)
+                ? Visibility.Hidden
+                : Visibility.Visible;
         }
 
         private async void ButtonRefresh_Click(object sender, RoutedEventArgs e) {
-            if (!_online) return;
+            if (!_online) {
+                return;
+            }
             LabelStatus.Content = "Downloading newest skin catalog file …";
             DisableNetworkControls();
             //BetterWebClient skinDownloadClient = new BetterWebClient();
@@ -165,42 +233,49 @@ namespace SteamSkinInstaller.UI {
                 await Task.Delay(5000);
                 LabelStatus.Content = "Ready.";
             } catch (Exception) {
-                MessageBox.Show("Something went wrong when trying to get the skin catalog file. Is GitHub offline? Did you delete the internet?", "Error getting skin catalog");
+                MessageBox.Show(
+                    "Something went wrong when trying to get the skin catalog file. Is GitHub offline? Did you delete the internet?",
+                    "Error getting skin catalog");
             }
             EnableNetworkControls();
-            for (int i = StackAvailable.Children.Count - 1; i >= 0; i--) {
-                StackAvailable.Children.RemoveAt(i);
-            }
-            int returncode;
 
-            _availableSkins = _availableSkinsCatalog.GetSkins(out returncode);
-
-            switch(returncode) {
-                case 0:
-                    foreach(Skin.Skin skin in _availableSkins) {
-                        StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
-                    }
-                    break;
-                case 1:
-                    StackAvailable.Children.Add(_noCatalogWarning);
-                    break;
-                case 2:
-                    StackAvailable.Children.Add(_errorReadingCatalogWarning);
-                    break;
-            }
+            RebuildAvailableTab();
         }
 
         private void SetInstallControlsState(bool state) {
-            if(_lockInstallControlState) {
+            if (_lockInstallControlsState) {
                 return;
             }
-            foreach(StackPanel skin in StackAvailable.Children) {
-                foreach(UIElement mightBeInnerPanel in skin.Children) {
-                    if(mightBeInnerPanel is DockPanel) {
-                        foreach(UIElement mightBeButtonPanel in ((DockPanel)mightBeInnerPanel).Children) {
-                            if(mightBeButtonPanel is StackPanel) {
-                                foreach(UIElement mightBeInstallButton in ((StackPanel)mightBeButtonPanel).Children) {
-                                    if(mightBeInstallButton is Button && (string)((Button)mightBeInstallButton).Content == "Install") {
+            foreach (StackPanel skin in StackAvailable.Children) {
+                foreach (UIElement mightBeInnerPanel in skin.Children) {
+                    if (mightBeInnerPanel is DockPanel) {
+                        foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
+                            if (mightBeButtonPanel is StackPanel) {
+                                foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeButtonPanel).Children) {
+                                    if (mightBeInstallButton is Button &&
+                                        (string) ((Button) mightBeInstallButton).Content == "Install") {
+                                        mightBeInstallButton.IsEnabled = state;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SetUpdateControlsState(bool state) {
+            if (_lockUpdateControlsState) {
+                return;
+            }
+            foreach (StackPanel skin in StackInstalled.Children) {
+                foreach (UIElement mightBeInnerPanel in skin.Children) {
+                    if (mightBeInnerPanel is DockPanel) {
+                        foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
+                            if (mightBeButtonPanel is StackPanel) {
+                                foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeButtonPanel).Children) {
+                                    if (mightBeInstallButton is Button &&
+                                        (string) ((Button) mightBeInstallButton).Content == "Update") {
                                         mightBeInstallButton.IsEnabled = state;
                                     }
                                 }
@@ -219,8 +294,17 @@ namespace SteamSkinInstaller.UI {
             SetInstallControlsState(false);
         }
 
+        private void EnableUpdateControls() {
+            SetUpdateControlsState(true);
+        }
+
+        private void DisableUpdateControls() {
+            SetUpdateControlsState(false);
+        }
+
         private void SetNetworkControlsState(bool state) {
             SetInstallControlsState(state);
+            SetUpdateControlsState(state);
             ButtonRefresh.IsEnabled = state;
         }
 
@@ -267,9 +351,7 @@ namespace SteamSkinInstaller.UI {
             websiteButton.Content = "Visit website";
             websiteButton.Style = (Style) FindResource("KewlButton");
             websiteButton.Margin = new Thickness(5);
-            websiteButton.Click += (sender, args) => {
-                Process.Start(skin.Entry.Website);
-            };
+            websiteButton.Click += (sender, args) => { Process.Start(skin.Entry.Website); };
             websiteButton.ToolTip = "Click here to see screenshots and more!";
             buttonPanel.Orientation = Orientation.Vertical;
 
@@ -289,8 +371,68 @@ namespace SteamSkinInstaller.UI {
             return outerSkinPanel;
         }
 
-        private void ButtonAbout_Click(object sender, RoutedEventArgs e) {
+        private StackPanel GetNewInstalledSkinFragment(Skin.Skin skin) {
+            StackPanel outerSkinPanel = new StackPanel();
+            Label skinNameLabel = new Label();
+            Label skinAuthorLabel = new Label();
+            StackPanel buttonPanel = new StackPanel();
+            Button updateButton = new Button();
+            DockPanel innerSkinPanel = new DockPanel();
+            TextBlock skinDescTextBlock = new TextBlock();
+            Button websiteButton = new Button();
 
+            skinNameLabel.Content = skin.Entry.Name;
+            skinNameLabel.Padding = new Thickness(0, 10, 0, 0);
+            skinNameLabel.FontSize = 20;
+
+            skinAuthorLabel.Content = "by " + skin.Entry.Author;
+            skinAuthorLabel.Padding = new Thickness(0);
+            outerSkinPanel.Orientation = Orientation.Vertical;
+
+            skinDescTextBlock.Text = skin.Entry.Description;
+            skinDescTextBlock.TextWrapping = TextWrapping.Wrap;
+            skinDescTextBlock.Margin = new Thickness(10);
+
+            updateButton.Content = "Update";
+            updateButton.Style = (Style) FindResource("KewlButton");
+            updateButton.Margin = new Thickness(5);
+            updateButton.Click += async (sender, args) => {
+                LabelStatus.Content = "Updating " + skin.Entry.Name + ". Please wait …";
+                DisableNetworkControls();
+                await
+                    (Task.Run(
+                        () =>
+                            (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                                ? skin.Install(_steamClient.GetInstallPath())
+                                : skin.Update(_steamClient.GetInstallPath())));
+                LabelStatus.Content = "Ready.";
+                EnableNetworkControls();
+            };
+            updateButton.ToolTip = "Shift + Click to perform a clean installation";
+            websiteButton.Content = "Visit website";
+            websiteButton.Style = (Style) FindResource("KewlButton");
+            websiteButton.Margin = new Thickness(5);
+            websiteButton.Click += (sender, args) => { Process.Start(skin.Entry.Website); };
+            websiteButton.ToolTip = "Click here to see screenshots and more!";
+            buttonPanel.Orientation = Orientation.Vertical;
+
+            buttonPanel.Children.Add(updateButton);
+            buttonPanel.Children.Add(websiteButton);
+
+            DockPanel.SetDock(skinDescTextBlock, Dock.Left);
+            DockPanel.SetDock(buttonPanel, Dock.Right);
+
+            innerSkinPanel.Children.Add(buttonPanel);
+            innerSkinPanel.Children.Add(skinDescTextBlock);
+
+            outerSkinPanel.Children.Add(skinNameLabel);
+            outerSkinPanel.Children.Add(skinAuthorLabel);
+            outerSkinPanel.Children.Add(innerSkinPanel);
+
+            return outerSkinPanel;
+        }
+
+        private void ButtonAbout_Click(object sender, RoutedEventArgs e) {
         }
     }
 }

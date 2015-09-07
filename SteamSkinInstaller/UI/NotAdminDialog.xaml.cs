@@ -6,12 +6,11 @@ namespace SteamSkinInstaller.UI {
     /// <summary>
     /// Interaction logic for NotAdminDialog.xaml
     /// </summary>
-    public partial class NotAdminDialog : Window {
-
+    public partial class NotAdminDialog {
         public NotAdminDialog() {
             InitializeComponent();
-            Left = (SystemParameters.PrimaryScreenWidth / 2) - (Width / 2);
-            Top = (SystemParameters.PrimaryScreenHeight / 2) - (Height / 2);
+            Left = (SystemParameters.PrimaryScreenWidth/2) - (Width/2);
+            Top = (SystemParameters.PrimaryScreenHeight/2) - (Height/2);
             ShieldIcon.Source = MiscTools.GetUACShieldIcon();
         }
 

@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace SteamSkinInstaller.Util {
-    static class MiscTools {
+    internal static class MiscTools {
         [DllImport("user32.dll")]
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
@@ -17,17 +17,19 @@ namespace SteamSkinInstaller.Util {
             public IntPtr Handle;
             public int IconIndex;
             public int PathIndex;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string ResourcePath;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public string ResourcePath;
         }
 
         [DllImport("Shell32.dll")]
         public static extern int SHGetStockIconInfo(int siid, int uFlags, ref SHSTOCKICONINFO psii);
 
         public static BitmapSource GetUACShieldIcon() {
-            SHSTOCKICONINFO shieldIconInfo = new SHSTOCKICONINFO {Size = (uint) Marshal.SizeOf(typeof (SHSTOCKICONINFO))};
+            SHSTOCKICONINFO shieldIconInfo = new SHSTOCKICONINFO {
+                Size = (uint) Marshal.SizeOf(typeof (SHSTOCKICONINFO))
+            };
             Marshal.ThrowExceptionForHR(SHGetStockIconInfo(77, 0x000000100, ref shieldIconInfo));
-            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(shieldIconInfo.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(shieldIconInfo.Handle, Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
         }
 
         public static void SendFontChangeBroadcast() {
@@ -41,11 +43,15 @@ namespace SteamSkinInstaller.Util {
             if (!File.Exists(filename)) {
                 return 1;
             }
-            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts", Path.GetFileName(filename)))) {
+            if (
+                File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts",
+                    Path.GetFileName(filename)))) {
                 return 2;
             }
             try {
-                File.Copy(filename, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts", Path.GetFileName(filename)));
+                File.Copy(filename,
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts",
+                        Path.GetFileName(filename)));
             } catch (Exception) {
                 return 1;
             }
@@ -76,7 +82,8 @@ namespace SteamSkinInstaller.Util {
                         intf =>
                             intf.OperationalStatus == OperationalStatus.Up && !intf.Name.ToLower().Contains("virtual") &&
                             !intf.Description.ToLower().Contains("virtual") && !intf.Name.ToLower().Contains("loopback") &&
-                            !intf.Description.ToLower().Contains("loopback") && intf.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                            !intf.Description.ToLower().Contains("loopback") &&
+                            intf.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
                             intf.NetworkInterfaceType != NetworkInterfaceType.Tunnel);
         }
 

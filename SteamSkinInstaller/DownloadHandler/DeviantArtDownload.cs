@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using SteamSkinInstaller.Util;
 
 namespace SteamSkinInstaller.DownloadHandler {
-    class DeviantArtDownload : IDownload {
+    internal class DeviantArtDownload : IDownload {
         private readonly string _url;
         private readonly bool _overwrite;
         private readonly string _filename;
@@ -17,8 +17,8 @@ namespace SteamSkinInstaller.DownloadHandler {
         private readonly string _folderName;
         private string _versionPageString;
 
-        public DeviantArtDownload(string url, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null,
-            string folderName = null, bool overwrite = false) {
+        public DeviantArtDownload(string url, string filename, string versionRegexPattern, int versionMatchGroup,
+            string versionMatchURL = null, string folderName = null, bool overwrite = false) {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(filename) || string.IsNullOrEmpty(versionRegexPattern)) {
                 throw new Exception("None of the parameters can be empty.");
             }

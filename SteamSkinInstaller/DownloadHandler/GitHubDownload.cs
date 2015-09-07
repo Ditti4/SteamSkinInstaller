@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using SteamSkinInstaller.Util;
 
 namespace SteamSkinInstaller.DownloadHandler {
-    class GitHubDownload : IDownload {
+    internal class GitHubDownload : IDownload {
         private readonly string _user;
         private readonly string _repo;
         private readonly string _filename;
@@ -18,8 +18,8 @@ namespace SteamSkinInstaller.DownloadHandler {
         private const string GithubBaseURL = "https://github.com/";
         private string _versionPageString;
 
-        public GitHubDownload(string user, string repo, string filename, string versionRegexPattern, int versionMatchGroup, string versionMatchURL = null,
-            bool overwrite = false, bool usetags = false) {
+        public GitHubDownload(string user, string repo, string filename, string versionRegexPattern,
+            int versionMatchGroup, string versionMatchURL = null, bool overwrite = false, bool usetags = false) {
             if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(repo) || string.IsNullOrEmpty(filename)) {
                 throw new Exception("None of the parameters can be empty.");
             }
@@ -39,7 +39,8 @@ namespace SteamSkinInstaller.DownloadHandler {
                 Directory.CreateDirectory(Skin.Skin.DownloadFolderName);
             }
             if (!File.Exists(Path.Combine(Skin.Skin.DownloadFolderName, _filename)) || _overwrite) {
-                downloadClient.DownloadFile(GithubBaseURL + _user + "/" + _repo + "/archive/master.zip", Path.Combine(Skin.Skin.DownloadFolderName, _filename));
+                downloadClient.DownloadFile(GithubBaseURL + _user + "/" + _repo + "/archive/master.zip",
+                    Path.Combine(Skin.Skin.DownloadFolderName, _filename));
             }
         }
 
@@ -52,7 +53,8 @@ namespace SteamSkinInstaller.DownloadHandler {
                 GetLatestReleaseTag();
             }
             if (!File.Exists(Path.Combine(Skin.Skin.DownloadFolderName, _filename)) || _overwrite) {
-                downloadClient.DownloadFile(GithubAPIRepoBaseURL + _user + "/" + _repo + "/zipball/" + _latestTag, Path.Combine(Skin.Skin.DownloadFolderName, _filename));
+                downloadClient.DownloadFile(GithubAPIRepoBaseURL + _user + "/" + _repo + "/zipball/" + _latestTag,
+                    Path.Combine(Skin.Skin.DownloadFolderName, _filename));
             }
         }
 
@@ -84,7 +86,7 @@ namespace SteamSkinInstaller.DownloadHandler {
                 return _usetags ? GetLatestReleaseTag() : GetLatestCommitHash();
             }
             Regex versionRegex = new Regex(_versionRegexPattern);
-            if(string.IsNullOrEmpty(_versionPageString)) {
+            if (string.IsNullOrEmpty(_versionPageString)) {
                 BetterWebClient versionPageClient = new BetterWebClient();
                 _versionPageString = versionPageClient.DownloadString(_versionMatchURL);
             }

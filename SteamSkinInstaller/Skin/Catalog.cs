@@ -6,12 +6,12 @@ using System.Windows;
 using System.Xml.Serialization;
 
 namespace SteamSkinInstaller.Skin {
-    class Catalog {
+    internal class Catalog {
         private readonly XmlSerializer _serializer;
         private readonly string _filename;
 
         public Catalog(string filename) {
-            _serializer = new XmlSerializer(typeof(List<CatalogEntry>));
+            _serializer = new XmlSerializer(typeof (List<CatalogEntry>));
             _filename = filename;
         }
 
@@ -19,6 +19,7 @@ namespace SteamSkinInstaller.Skin {
          *            1 - file not found
          *            2 - error while trying to deserialize
          */
+
         public List<CatalogEntry> GetEntries(out int errorcode) {
             List<CatalogEntry> returnList = null;
             if (!File.Exists(_filename)) {
@@ -45,11 +46,12 @@ namespace SteamSkinInstaller.Skin {
                 returnList = entryList.Select(catalogEntry => new Skin(catalogEntry)).ToList();
             }
             return returnList;
-        } 
+        }
 
         /* return: 0 - no error
          *         1 - error while trying to serialize
          */
+
         public int SaveEntries(List<CatalogEntry> inList) {
             try {
                 using (FileStream outFileStream = File.Open(_filename, FileMode.Create)) {

@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace SteamSkinInstaller.Steam {
-    class ClientProperties {
+    internal class ClientProperties {
         private readonly string _installPath;
         private readonly string _exePath;
         private string _skin;
@@ -26,14 +26,15 @@ namespace SteamSkinInstaller.Steam {
                     "You may, however, specify your own Steam installation location in the settings. " +
                     "You will not be able to install skins until this is fixed. This is done for your own safety.");
             }
-            _skin = (string) Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam", "SkinV4", null);
+            _skin =
+                (string) Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Valve\Steam", "SkinV4", null);
             if (File.Exists(Path.Combine(_installPath, "package", "beta"))) {
                 _beta = true;
             }
         }
 
         public ClientProperties(string installPath) {
-            if(!File.Exists(Path.Combine(installPath, "Steam.exe"))) {
+            if (!File.Exists(Path.Combine(installPath, "Steam.exe"))) {
                 _installPath = null;
                 throw new Exception("Invalid Steam install path.");
             }
