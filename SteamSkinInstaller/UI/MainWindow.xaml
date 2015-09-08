@@ -29,7 +29,15 @@
                     <Button Content="Reset" HorizontalAlignment="Right" Margin="15" VerticalAlignment="Bottom" Style="{DynamicResource KewlButton}"/>
                     <Button Content="Save to config" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="120,15" Style="{DynamicResource KewlButton}"/>
                     <CheckBox Content="Restart Steam after applying a new skin" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top"/>
-                    <Button Name="ButtonAbout" Content="About …" HorizontalAlignment="Left" Margin="10,0,0,15" VerticalAlignment="Bottom" Width="75" Style="{DynamicResource KewlButton}" Click="ButtonAbout_Click"/>
+                    <Button Name="ButtonAbout" Content="About …" HorizontalAlignment="Left" Margin="10,0,0,15" VerticalAlignment="Bottom" Style="{DynamicResource KewlButton}" Click="ButtonAbout_Click"/>
+                    <Button Name="ButtonUnelevated" HorizontalAlignment="Left" Margin="115,0,0,15" VerticalAlignment="Bottom" Style="{DynamicResource KewlButton}" Width="135" Click="ButtonUnelevated_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="16" Width="16" Name="InfoIcon" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <TextBlock Margin="1,0">
+                                Running unelevated
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
                 </Grid>
             </TabItem>
         </TabControl>

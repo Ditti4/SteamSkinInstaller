@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Security.Principal;
@@ -8,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 using SteamSkinInstaller.Skin;
 using SteamSkinInstaller.Steam;
 using SteamSkinInstaller.Util;
@@ -59,23 +62,9 @@ namespace SteamSkinInstaller.UI {
 
             Left = (SystemParameters.PrimaryScreenWidth/2) - (Width/2);
             Top = (SystemParameters.PrimaryScreenHeight/2) - (Height/2);
-            if (Environment.OSVersion.Version.Major >= 6 && !IsAdmin()) {
-                NotAdminDialog notAdminDialog = new NotAdminDialog();
-                notAdminDialog.ShowDialog();
-                if (notAdminDialog.DialogResult.HasValue && notAdminDialog.DialogResult.Value) {
-                    ProcessStartInfo restartProgramInfo = new ProcessStartInfo {
-                        FileName = Assembly.GetEntryAssembly().CodeBase,
-                        Verb = "runas"
-                    };
-                    try {
-                        Process.Start(restartProgramInfo);
-                        Close();
-                    } catch (Exception) {
-                        // user denied the UAC request so we're falling back to non-elevated mode
-                        // this will disable the experimental font installation and the "let me
-                        // change the skin for you" thingy
-                    }
-                }
+            InfoIcon.Source = Imaging.CreateBitmapSourceFromHIcon(SystemIcons.Information.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            if (IsAdmin()) {
+                ButtonUnelevated.Visibility = Visibility.Hidden;
             }
 
             bool invalidSteamLocation = false;
@@ -185,6 +174,25 @@ namespace SteamSkinInstaller.UI {
 
         private void ButtonAbout_Click(object sender, RoutedEventArgs e) {
             (new AboutDialog()).ShowDialog();
+        }
+
+        private void ButtonUnelevated_Click(object sender, RoutedEventArgs e) {
+            NotAdminDialog notAdminDialog = new NotAdminDialog();
+            notAdminDialog.ShowDialog();
+            if(notAdminDialog.DialogResult.HasValue && notAdminDialog.DialogResult.Value) {
+                ProcessStartInfo restartProgramInfo = new ProcessStartInfo {
+                    FileName = Assembly.GetEntryAssembly().CodeBase,
+                    Verb = "runas"
+                };
+                try {
+                    Process.Start(restartProgramInfo);
+                    Close();
+                } catch(Exception) {
+                    // user denied the UAC request so we're falling back to non-elevated mode
+                    // this will disable the experimental font installation and the "let me
+                    // change the skin for you" thingy
+                }
+            }
         }
 
         private StackPanel GetNewAvailableSkinFragment(Skin.Skin skin) {
