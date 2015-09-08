@@ -8,7 +8,8 @@ namespace SteamSkinInstaller.UI {
     /// <summary>
     /// Interaction logic for AboutDialog.xaml
     /// </summary>
-    public partial class AboutDialog : Window {
+    public partial class AboutDialog {
+        private string _codename = "Knorke";
         private string[] _developers = {
             "Rico \"Ditti4\" Dittrich",
         };
@@ -19,7 +20,10 @@ namespace SteamSkinInstaller.UI {
             Left = (SystemParameters.PrimaryScreenWidth / 2) - (Width / 2);
             Top = (SystemParameters.PrimaryScreenHeight / 2) - (Height / 2);
 
-            TextVersion.Text = TextVersion.Text.Replace("%versionplaceholder%", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            string version = Assembly.GetExecutingAssembly().GetName().Version.Major.ToString() + "." +
+                             Assembly.GetExecutingAssembly().GetName().Version.Minor.ToString() + " \"" + _codename + "\"";
+
+            TextVersion.Text = TextVersion.Text.Replace("%versionplaceholder%", version);
 
             foreach (string dev in _developers) {
                 BoxDevelopers.AppendText(dev + Environment.NewLine);
