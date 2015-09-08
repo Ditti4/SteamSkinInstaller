@@ -187,11 +187,18 @@ namespace SteamSkinInstaller.UI {
         }
 
         private void ButtonAbout_Click(object sender, RoutedEventArgs e) {
-            (new AboutDialog()).ShowDialog();
+            AboutDialog aboutDialog = new AboutDialog {
+                Owner = this,
+                ShowInTaskbar = false
+            };
+            aboutDialog.ShowDialog();
         }
 
         private void ButtonUnelevated_Click(object sender, RoutedEventArgs e) {
-            NotAdminDialog notAdminDialog = new NotAdminDialog();
+            NotAdminDialog notAdminDialog = new NotAdminDialog {
+                Owner = this,
+                ShowInTaskbar = false
+            };
             notAdminDialog.ShowDialog();
             if (notAdminDialog.DialogResult.HasValue && notAdminDialog.DialogResult.Value) {
                 ProcessStartInfo restartProgramInfo = new ProcessStartInfo {

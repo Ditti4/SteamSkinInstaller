@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Xml.Serialization;
 
 namespace SteamSkinInstaller.Skin {
@@ -30,7 +29,7 @@ namespace SteamSkinInstaller.Skin {
                         returnList = (List<CatalogEntry>) _serializer.Deserialize(inFileStream);
                         errorcode = 0;
                     }
-                } catch (Exception e) {
+                } catch (Exception) {
                     errorcode = 2;
                 }
             }
@@ -38,9 +37,8 @@ namespace SteamSkinInstaller.Skin {
         }
 
         public List<Skin> GetSkins(out int errorcode) {
-            List<CatalogEntry> entryList = null;
             List<Skin> returnList = null;
-            entryList = GetEntries(out errorcode);
+            List<CatalogEntry> entryList = GetEntries(out errorcode);
             if (errorcode == 0) {
                 returnList = entryList.Select(catalogEntry => new Skin(catalogEntry)).ToList();
             }
