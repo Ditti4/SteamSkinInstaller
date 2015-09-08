@@ -70,6 +70,9 @@ namespace SteamSkinInstaller.UI {
                 ButtonUnelevated.Visibility = Visibility.Hidden;
             }
 
+            _lockInstallControlsState = false;
+            _lockUpdateControlsState = false;
+
             bool invalidSteamLocation = false;
 
             try {
