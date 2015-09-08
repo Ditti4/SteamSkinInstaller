@@ -1,0 +1,10 @@
+﻿<Window x:Class="SteamSkinInstaller.UI.AboutDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AboutDialog" Height="300" Width="300">
+    <Grid>
+        <TextBlock Name="TextVersion"  HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="50" Width="272">
+            Steam Skin Installer Version %versionplaceholder%<LineBreak/>A project written by Ditti4 to support the laziness of Steam users.<LineBreak/>
+        </TextBlock>
+    </Grid>
+</Window>
