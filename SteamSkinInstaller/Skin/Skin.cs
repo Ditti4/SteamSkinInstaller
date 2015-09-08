@@ -10,8 +10,9 @@ using SteamSkinInstaller.DownloadHandler;
 namespace SteamSkinInstaller.Skin {
     internal class Skin {
         public static string DownloadFolderName = "SSIDownloads";
-        private IDownload _downloadHandler;
         public readonly CatalogEntry Entry;
+        public bool SuccessfulInstallation;
+        private IDownload _downloadHandler;
         private readonly string _filename;
         private Exception _lastException;
 
@@ -53,13 +54,13 @@ namespace SteamSkinInstaller.Skin {
                         "This is a bug in this very tool right here. In case you do have a GitHub account, please submit a bug report at https://github.com/Ditti4/SteamSkinInstaller " +
                         "using the following details:\n\n" + _lastException.Message,
                         "Error trying to create the download handler");
-                    break;
+                    return 1;
                 case 2:
                     MessageBox.Show(
                         "Somehow I wasn't able to download the file archive although everything looks fine. " +
                         "Don't blame me, though, blame yourself for being low on disk space, your boss or somebody else.",
                         "Error downloading file");
-                    break;
+                    return 1;
             }
             if (Unpack() != 0) {
                 MessageBox.Show(
@@ -67,13 +68,15 @@ namespace SteamSkinInstaller.Skin {
                     "please make sure you have enough free disk space and try again later. Exact error message:\n\n" +
                     _lastException.Message,
                     "Error trying to extract the archive");
+                return 1;
             }
             if (CleanupOnInstall() != 0) {
                 MessageBox.Show(
                     "Looks like something went wrong when trying to delete a few files and folders which are supposed to be deleted. " +
-                    "You shouldn't have to worry about that but if you're interested in the detailed error message " +
-                    "then here you go:\n\n" +
+                    "Just in case we're going to stop the install process because I don't know what exactly went wrong. Here's the " +
+                    "exact error message which you may use to resolve the problem:\n\n" +
                     _lastException.Message, "Error while trying to clean up");
+                return 1;
             }
             if (MoveToSkinFolder(installPath) != 0) {
                 MessageBox.Show(
@@ -81,9 +84,9 @@ namespace SteamSkinInstaller.Skin {
                     "please make sure you have enough free disk space and try again later. Exact error message:\n\n" +
                     _lastException.Message,
                     "Error trying to move the skin folder");
-            } else {
-                FullCleanup();
+                return 1;
             }
+            FullCleanup();
             return 0;
         }
 
@@ -95,13 +98,13 @@ namespace SteamSkinInstaller.Skin {
                         "This is a bug in this very tool right here. In case you do have a GitHub account, please submit a bug report at https://github.com/Ditti4/SteamSkinInstaller " +
                         "using the following details:\n\n" + _lastException.Message,
                         "Error trying to create the download handler");
-                    break;
+                    return 1;
                 case 2:
                     MessageBox.Show(
                         "Somehow I wasn't able to download the file archive although everything looks fine. " +
                         "Don't blame me, though, blame yourself for being low on disk space, your boss or somebody else.",
                         "Error downloading file");
-                    break;
+                    return 1;
             }
             if (Unpack() != 0) {
                 MessageBox.Show(
@@ -109,13 +112,15 @@ namespace SteamSkinInstaller.Skin {
                     "please make sure you have enough free disk space and try again later. Exact error message:\n\n" +
                     _lastException.Message,
                     "Error trying to extract the archive");
+                return 1;
             }
             if (CleanupOnUpdate() != 0) {
                 MessageBox.Show(
                     "Looks like something went wrong when trying to delete a few files and folders which are supposed to be deleted. " +
-                    "You shouldn't have to worry about that but if you're interested in the detailed error message " +
-                    "then here you go:\n\n" +
+                    "Just in case we're going to stop the install process because I don't know what exactly went wrong. Here's the " +
+                    "exact error message which you may use to resolve the problem:\n\n" +
                     _lastException.Message, "Error while trying to clean up");
+                return 1;
             }
             if (MoveToSkinFolder(installPath) != 0) {
                 MessageBox.Show(
@@ -123,9 +128,9 @@ namespace SteamSkinInstaller.Skin {
                     "please make sure you have enough free disk space and try again later. Exact error message:\n\n" +
                     _lastException.Message,
                     "Error trying to move the skin folder");
-            } else {
-                FullCleanup();
+                return 1;
             }
+            FullCleanup();
             return 0;
         }
 

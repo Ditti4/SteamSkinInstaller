@@ -31,7 +31,6 @@ namespace SteamSkinInstaller.Skin {
                         errorcode = 0;
                     }
                 } catch (Exception e) {
-                    MessageBox.Show(e.Message);
                     errorcode = 2;
                 }
             }
