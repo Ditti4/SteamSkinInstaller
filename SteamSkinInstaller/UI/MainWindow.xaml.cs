@@ -134,65 +134,6 @@ namespace SteamSkinInstaller.UI {
             SetOnlineStatus();
         }
 
-        private void RebuildAvailableTab() {
-            int returncode;
-
-            _availableSkins = _availableSkinsCatalog.GetSkins(out returncode);
-
-            switch (returncode) {
-                case 0:
-                    foreach (Skin.Skin skin in _availableSkins) {
-                        StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
-                    }
-                    break;
-                case 1:
-                    StackAvailable.Children.Add(_noCatalogWarning);
-                    break;
-                case 2:
-                    StackAvailable.Children.Add(_errorReadingCatalogWarning);
-                    break;
-            }
-        }
-
-        private void RebuildInstalledTab() {
-            for (int i = StackInstalled.Children.Count - 1; i >= 0; i--) {
-                StackInstalled.Children.RemoveAt(i);
-            }
-
-            int returncode;
-
-            _installedSkinsCatalog = new Catalog(Path.Combine(_steamClient.GetInstallPath(), "skins", "skins.xml"));
-            _installedSkins = _installedSkinsCatalog.GetSkins(out returncode);
-
-            switch (returncode) {
-                case 0:
-                    foreach (Skin.Skin skin in _installedSkins) {
-                        StackInstalled.Children.Add(GetNewInstalledSkinFragment(skin));
-                    }
-                    break;
-                case 1:
-                    StackInstalled.Children.Add(_noInstalledCatalogWarning);
-                    break;
-                case 2:
-                    StackInstalled.Children.Add(_errorReadingInstalledCatalogWarning);
-                    break;
-            }
-        }
-
-        private async void SetOnlineStatus() {
-            DisableNetworkControls();
-            LabelStatus.Content = "Checking internet connection, please wait …";
-            if (!await Task.Run(() => MiscTools.IsComputerOnline())) {
-                LabelStatus.Content = "Computer is not online. All online functionality will be disabled.";
-                await Task.Delay(5000);
-                _online = false;
-            } else {
-                _online = true;
-            }
-            LabelStatus.Content = "Ready.";
-            EnableNetworkControls();
-        }
-
         private void ButtonSteamLocation_Click(object sender, RoutedEventArgs e) {
             //TODO: Create a custom version of the folder browser dialog so I don't need to mix Windows Forms and WPF
             System.Windows.Forms.FolderBrowserDialog steamFolder = new System.Windows.Forms.FolderBrowserDialog {
@@ -242,78 +183,8 @@ namespace SteamSkinInstaller.UI {
             RebuildAvailableTab();
         }
 
-        private void SetInstallControlsState(bool state) {
-            if (_lockInstallControlsState) {
-                return;
-            }
-            foreach (StackPanel skin in StackAvailable.Children) {
-                foreach (UIElement mightBeInnerPanel in skin.Children) {
-                    if (mightBeInnerPanel is DockPanel) {
-                        foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
-                            if (mightBeButtonPanel is StackPanel) {
-                                foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeButtonPanel).Children) {
-                                    if (mightBeInstallButton is Button &&
-                                        (string) ((Button) mightBeInstallButton).Content == "Install") {
-                                        mightBeInstallButton.IsEnabled = state;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void SetUpdateControlsState(bool state) {
-            if (_lockUpdateControlsState) {
-                return;
-            }
-            foreach (StackPanel skin in StackInstalled.Children) {
-                foreach (UIElement mightBeInnerPanel in skin.Children) {
-                    if (mightBeInnerPanel is DockPanel) {
-                        foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
-                            if (mightBeButtonPanel is StackPanel) {
-                                foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeButtonPanel).Children) {
-                                    if (mightBeInstallButton is Button &&
-                                        (string) ((Button) mightBeInstallButton).Content == "Update") {
-                                        mightBeInstallButton.IsEnabled = state;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void EnableInstallControls() {
-            SetInstallControlsState(true);
-        }
-
-        private void DisableInstallControls() {
-            SetInstallControlsState(false);
-        }
-
-        private void EnableUpdateControls() {
-            SetUpdateControlsState(true);
-        }
-
-        private void DisableUpdateControls() {
-            SetUpdateControlsState(false);
-        }
-
-        private void SetNetworkControlsState(bool state) {
-            SetInstallControlsState(state);
-            SetUpdateControlsState(state);
-            ButtonRefresh.IsEnabled = state;
-        }
-
-        private void EnableNetworkControls() {
-            SetNetworkControlsState(true);
-        }
-
-        private void DisableNetworkControls() {
-            SetNetworkControlsState(false);
+        private void ButtonAbout_Click(object sender, RoutedEventArgs e) {
+            (new AboutDialog()).ShowDialog();
         }
 
         private StackPanel GetNewAvailableSkinFragment(Skin.Skin skin) {
@@ -432,7 +303,143 @@ namespace SteamSkinInstaller.UI {
             return outerSkinPanel;
         }
 
-        private void ButtonAbout_Click(object sender, RoutedEventArgs e) {
+        private void RebuildAvailableTab() {
+            int returncode;
+
+            _availableSkins = _availableSkinsCatalog.GetSkins(out returncode);
+
+            switch(returncode) {
+                case 0:
+                    foreach(Skin.Skin skin in _availableSkins) {
+                        StackAvailable.Children.Add(GetNewAvailableSkinFragment(skin));
+                    }
+                    break;
+                case 1:
+                    StackAvailable.Children.Add(_noCatalogWarning);
+                    break;
+                case 2:
+                    StackAvailable.Children.Add(_errorReadingCatalogWarning);
+                    break;
+            }
+        }
+
+        private void RebuildInstalledTab() {
+            for(int i = StackInstalled.Children.Count - 1; i >= 0; i--) {
+                StackInstalled.Children.RemoveAt(i);
+            }
+
+            int returncode;
+
+            _installedSkinsCatalog = new Catalog(Path.Combine(_steamClient.GetInstallPath(), "skins", "skins.xml"));
+            _installedSkins = _installedSkinsCatalog.GetSkins(out returncode);
+
+            switch(returncode) {
+                case 0:
+                    foreach(Skin.Skin skin in _installedSkins) {
+                        StackInstalled.Children.Add(GetNewInstalledSkinFragment(skin));
+                    }
+                    break;
+                case 1:
+                    StackInstalled.Children.Add(_noInstalledCatalogWarning);
+                    break;
+                case 2:
+                    StackInstalled.Children.Add(_errorReadingInstalledCatalogWarning);
+                    break;
+            }
+        }
+
+        private async void SetOnlineStatus() {
+            DisableNetworkControls();
+            LabelStatus.Content = "Checking internet connection, please wait …";
+            if(!await Task.Run(() => MiscTools.IsComputerOnline())) {
+                LabelStatus.Content = "Computer is not online. All online functionality will be disabled.";
+                await Task.Delay(5000);
+                _online = false;
+            } else {
+                _online = true;
+            }
+            LabelStatus.Content = "Ready.";
+            EnableNetworkControls();
+        }
+
+        private void SetInstallControlsState(bool state) {
+            if(_lockInstallControlsState) {
+                return;
+            }
+            if(!(StackAvailable.Children[0] is StackPanel)) {
+                return;
+            }
+            foreach(StackPanel skin in StackAvailable.Children) {
+                foreach(UIElement mightBeInnerPanel in skin.Children) {
+                    if(mightBeInnerPanel is DockPanel) {
+                        foreach(UIElement mightBeButtonPanel in ((DockPanel)mightBeInnerPanel).Children) {
+                            if(mightBeButtonPanel is StackPanel) {
+                                foreach(UIElement mightBeInstallButton in ((StackPanel)mightBeButtonPanel).Children) {
+                                    if(mightBeInstallButton is Button &&
+                                        (string)((Button)mightBeInstallButton).Content == "Install") {
+                                        mightBeInstallButton.IsEnabled = state;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SetUpdateControlsState(bool state) {
+            if(_lockUpdateControlsState) {
+                return;
+            }
+            if (!(StackInstalled.Children[0] is StackPanel)) {
+                return;
+            }
+            foreach(StackPanel skin in StackInstalled.Children) {
+                foreach(UIElement mightBeInnerPanel in skin.Children) {
+                    if(mightBeInnerPanel is DockPanel) {
+                        foreach(UIElement mightBeButtonPanel in ((DockPanel)mightBeInnerPanel).Children) {
+                            if(mightBeButtonPanel is StackPanel) {
+                                foreach(UIElement mightBeUpdateButton in ((StackPanel)mightBeButtonPanel).Children) {
+                                    if(mightBeUpdateButton is Button &&
+                                        (string)((Button)mightBeUpdateButton).Content == "Update") {
+                                        mightBeUpdateButton.IsEnabled = state;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void EnableInstallControls() {
+            SetInstallControlsState(true);
+        }
+
+        private void DisableInstallControls() {
+            SetInstallControlsState(false);
+        }
+
+        private void EnableUpdateControls() {
+            SetUpdateControlsState(true);
+        }
+
+        private void DisableUpdateControls() {
+            SetUpdateControlsState(false);
+        }
+
+        private void SetNetworkControlsState(bool state) {
+            SetInstallControlsState(state);
+            SetUpdateControlsState(state);
+            ButtonRefresh.IsEnabled = state;
+        }
+
+        private void EnableNetworkControls() {
+            SetNetworkControlsState(true);
+        }
+
+        private void DisableNetworkControls() {
+            SetNetworkControlsState(false);
         }
     }
 }
