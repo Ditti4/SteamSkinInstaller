@@ -115,6 +115,14 @@ namespace SteamSkinInstaller.Skin {
                     "Error trying to extract the archive");
                 return 1;
             }
+            if (CleanupOnInstall() != 0) {
+                MessageBox.Show(
+                    "Looks like something went wrong when trying to delete a few files and folders which are supposed to be deleted. " +
+                    "Just in case we're going to stop the install process because I don't know what exactly went wrong. Here's the " +
+                    "exact error message which you may use to resolve the problem:\n\n" +
+                    _lastException.Message, "Error while trying to clean up");
+                return 1;
+            }
             if (CleanupOnUpdate() != 0) {
                 MessageBox.Show(
                     "Looks like something went wrong when trying to delete a few files and folders which are supposed to be deleted. " +
