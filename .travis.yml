@@ -1,5 +1,17 @@
 language: csharp
 solution: SteamSkinInstaller.sln
+before_script:
+  - sed -i 's/Page/Resource/' SteamSkinInstaller/SteamSkinInstaller.csproj
+  - sed -i 's/<Reference Include="PresentationCore" \/>/<!-- \0 -->/' SteamSkinInstaller/SteamSkinInstaller.csproj
+  - sed -i 's/<Reference Include="PresentationFramework" \/>/<!-- \0 -->/' SteamSkinInstaller/SteamSkinInstaller.csproj
+  - sed -i 's/\.xaml\.cs/\.nowpf\.cs/' SteamSkinInstaller/SteamSkinInstaller.csproj
+  - sed -i 's/MiscTools\.cs/MiscTools\.nowpf\.cs/' SteamSkinInstaller/SteamSkinInstaller.csproj
+  - sed -i 's/\[assembly. ThemeInfo/\/\*\0/' SteamSkinInstaller/Properties/AssemblyInfo.cs
+  - sed -i 's/^)\]$/\0\*\//' SteamSkinInstaller/Properties/AssemblyInfo.cs
+  - sed -i 's/internal class Skin {/internal class Skin {\npublic static class MessageBox {\npublic static void Show(string s1) {}\npublic static void Show(string s1, string s2) {} }/' SteamSkinInstaller/Skin/Skin.cs
+  - cat SteamSkinInstaller/SteamSkinInstaller.csproj
+  - cat SteamSkinInstaller/Properties/AssemblyInfo.cs
+  - cat SteamSkinInstaller/Skin/Skin.cs
 notifications:
   email: false
   irc:
