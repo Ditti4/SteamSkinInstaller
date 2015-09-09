@@ -303,13 +303,12 @@ namespace SteamSkinInstaller.UI {
             updateButton.Click += async (sender, args) => {
                 LabelStatus.Content = "Updating " + skin.Entry.Name + ". Please wait …";
                 DisableNetworkControls();
-                int returncode =
-                    await
-                        (Task.Run(
-                            () =>
-                                (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-                                    ? skin.Install(_steamClient.GetInstallPath())
-                                    : skin.Update(_steamClient.GetInstallPath())));
+                await
+                    (Task.Run(
+                        () =>
+                            (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                                ? skin.Install(_steamClient.GetInstallPath())
+                                : skin.Update(_steamClient.GetInstallPath())));
                 LabelStatus.Content = "Ready.";
                 EnableNetworkControls();
             };

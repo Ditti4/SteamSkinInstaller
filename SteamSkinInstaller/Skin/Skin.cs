@@ -78,6 +78,7 @@ namespace SteamSkinInstaller.Skin {
                     _lastException.Message, "Error while trying to clean up");
                 return 1;
             }
+            Remove(installPath);
             if (MoveToSkinFolder(installPath) != 0) {
                 MessageBox.Show(
                     "An error occured while trying to move the extracted files. This probably isn't my fault so " +
@@ -205,6 +206,13 @@ namespace SteamSkinInstaller.Skin {
                 return 1;
             }
             return 0;
+        }
+
+        public void Remove(string installPath) {
+            string fullPath = Path.Combine(installPath, "skins", Entry.Name);
+            if (Directory.Exists(fullPath)) {
+                Directory.Delete(fullPath, true);
+            }
         }
 
         public int MoveToSkinFolder(string installPath) {
