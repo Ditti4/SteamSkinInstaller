@@ -2,6 +2,7 @@
 using System.Net;
 
 namespace SteamSkinInstaller.Util {
+    [System.ComponentModel.DesignerCategory("Code")]
     internal class BetterWebClient : WebClient {
         protected CookieContainer Cookies;
         protected string Referer;

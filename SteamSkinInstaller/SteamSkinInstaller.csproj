@@ -104,9 +104,7 @@
     <Compile Include="UI\NotAdminDialog.xaml.cs">
       <DependentUpon>NotAdminDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Util\BetterWebClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Util\BetterWebClient.cs" />
     <Compile Include="Util\MiscTools.cs" />
     <ApplicationDefinition Include="UI\App.xaml">
       <Generator>MSBuild:Compile</Generator>
