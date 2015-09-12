@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamSkinInstaller", "SteamSkinInstaller\SteamSkinInstaller.csproj", "{6093F4E0-4ADB-4324-988C-DA7C34DD20E3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamSkinInstallerCatalogHelper", "SteamSkinInstallerCatalogHelper\SteamSkinInstallerCatalogHelper.csproj", "{9B9F8A0F-4CF5-4830-B1EE-46D25990DB30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6093F4E0-4ADB-4324-988C-DA7C34DD20E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6093F4E0-4ADB-4324-988C-DA7C34DD20E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6093F4E0-4ADB-4324-988C-DA7C34DD20E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B9F8A0F-4CF5-4830-B1EE-46D25990DB30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B9F8A0F-4CF5-4830-B1EE-46D25990DB30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B9F8A0F-4CF5-4830-B1EE-46D25990DB30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B9F8A0F-4CF5-4830-B1EE-46D25990DB30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
