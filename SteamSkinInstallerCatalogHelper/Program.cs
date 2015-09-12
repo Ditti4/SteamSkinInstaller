@@ -7,9 +7,9 @@ using SteamSkinInstaller.Skin;
 
 namespace SteamSkinInstallerCatalogHelper {
     public class Program {
-        static void Main(string[] args) {
+        private static void Main(string[] args) {
             List<CatalogEntry> skinsList;
-            XmlSerializer serializer = new XmlSerializer(typeof(List<CatalogEntry>));
+            XmlSerializer serializer = new XmlSerializer(typeof (List<CatalogEntry>));
             try {
                 using (FileStream file = new FileStream("skins.xml", FileMode.Open)) {
                     skinsList = serializer.Deserialize(file) as List<CatalogEntry>;
@@ -72,7 +72,8 @@ namespace SteamSkinInstallerCatalogHelper {
                 Console.Write("Remote version match group (integer value): ");
                 newSkin.RemoteVersionInfo.MatchGroup = Convert.ToInt32(Console.ReadLine());
             }
-            Console.Write("Local version match file (relative to the skin's folder, 'resource\\menus\\steam.menu' for example): ");
+            Console.Write(
+                "Local version match file (relative to the skin's folder, 'resource\\menus\\steam.menu' for example): ");
             newSkin.LocalVersionInfo.MatchURL = Console.ReadLine();
             Console.Write("Local version match pattern: ");
             newSkin.LocalVersionInfo.MatchPattern = Console.ReadLine();
@@ -80,7 +81,7 @@ namespace SteamSkinInstallerCatalogHelper {
             newSkin.LocalVersionInfo.MatchGroup = Convert.ToInt32(Console.ReadLine());
 
             Console.Write("Add a font? (yes or no) ");
-            while(Console.ReadLine().Equals("yes")) {
+            while (Console.ReadLine().Equals("yes")) {
                 newSkin.ExtraStuff.FontList.Add(new CatalogEntry.ExtraInfo.Font());
                 Console.Write("Font file name (including directory, relative to the skin's folder): ");
                 newSkin.ExtraStuff.FontList.Last().FileName = Console.ReadLine();
@@ -90,28 +91,28 @@ namespace SteamSkinInstallerCatalogHelper {
             }
 
             Console.Write("Delete a file when installing a new skin? (yes or no) ");
-            while(Console.ReadLine().Equals("yes")) {
+            while (Console.ReadLine().Equals("yes")) {
                 Console.Write("File name (including directory, relative to the skin's folder): ");
                 newSkin.ExtraStuff.FilesToDeleteOnInstall.Add(Console.ReadLine());
                 Console.Write("Add another file to delete? (yes or no) ");
             }
 
             Console.Write("Recursively delete a folder when installing a new skin? (yes or no) ");
-            while(Console.ReadLine().Equals("yes")) {
+            while (Console.ReadLine().Equals("yes")) {
                 Console.Write("Folder name (relative to the skin's folder): ");
                 newSkin.ExtraStuff.FoldersToDeleteOnInstall.Add(Console.ReadLine());
                 Console.Write("Add another folder to delete? (yes or no) ");
             }
 
             Console.Write("Delete a file when updating an installed skin? (yes or no) ");
-            while(Console.ReadLine().Equals("yes")) {
+            while (Console.ReadLine().Equals("yes")) {
                 Console.Write("File name (including directory, relative to the skin's folder): ");
                 newSkin.ExtraStuff.FilesToDeleteOnUpdate.Add(Console.ReadLine());
                 Console.Write("Add another file to delete? (yes or no) ");
             }
 
             Console.Write("Recursively delete a folder when updating an installed skin? (yes or no) ");
-            while(Console.ReadLine().Equals("yes")) {
+            while (Console.ReadLine().Equals("yes")) {
                 Console.Write("Folder name (relative to the skin's folder): ");
                 newSkin.ExtraStuff.FoldersToDeleteOnUpdate.Add(Console.ReadLine());
                 Console.Write("Add another folder to delete? (yes or no) ");
