@@ -7,25 +7,30 @@ using SteamSkinInstaller.Skin;
 
 namespace SteamSkinInstallerCatalogHelper {
     public class Program {
-        private static void Main(string[] args) {
+        private static void Main() {
             List<CatalogEntry> skinsList;
             XmlSerializer serializer = new XmlSerializer(typeof (List<CatalogEntry>));
             try {
                 using (FileStream file = new FileStream("skins.xml", FileMode.Open)) {
                     skinsList = serializer.Deserialize(file) as List<CatalogEntry>;
                 }
+                if (skinsList == null) {
+                    skinsList = new List<CatalogEntry>();
+                }
             } catch (Exception) {
                 skinsList = new List<CatalogEntry>();
             }
 
-            CatalogEntry newSkin = new CatalogEntry();
-            newSkin.FileDownload = new CatalogEntry.DownloadInfo();
-            newSkin.RemoteVersionInfo = new CatalogEntry.VersionInfo();
-            newSkin.LocalVersionInfo = new CatalogEntry.VersionInfo();
-            newSkin.ExtraStuff = new CatalogEntry.ExtraInfo();
-            newSkin.ExtraStuff.FontList = new List<CatalogEntry.ExtraInfo.Font>();
-            newSkin.ExtraStuff.FilesToDeleteOnInstall = new List<string>();
-            newSkin.ExtraStuff.FoldersToDeleteOnInstall = new List<string>();
+            CatalogEntry newSkin = new CatalogEntry {
+                FileDownload = new CatalogEntry.DownloadInfo(),
+                RemoteVersionInfo = new CatalogEntry.VersionInfo(),
+                LocalVersionInfo = new CatalogEntry.VersionInfo(),
+                ExtraStuff = new CatalogEntry.ExtraInfo {
+                    FontList = new List<CatalogEntry.ExtraInfo.Font>(),
+                    FilesToDeleteOnInstall = new List<string>(),
+                    FoldersToDeleteOnInstall = new List<string>()
+                }
+            };
 
             Console.Write("New skin's name: ");
             newSkin.Name = Console.ReadLine();
