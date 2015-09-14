@@ -24,7 +24,6 @@ namespace SteamSkinInstallerCatalogHelper {
             CatalogEntry newSkin = new CatalogEntry {
                 FileDownload = new CatalogEntry.DownloadInfo(),
                 RemoteVersionInfo = new CatalogEntry.VersionInfo(),
-                LocalVersionInfo = new CatalogEntry.VersionInfo(),
                 ExtraStuff = new CatalogEntry.ExtraInfo {
                     FontList = new List<CatalogEntry.ExtraInfo.Font>(),
                     FilesToDeleteOnInstall = new List<string>(),
@@ -77,12 +76,6 @@ namespace SteamSkinInstallerCatalogHelper {
                 Console.Write("Remote version match group (integer value): ");
                 newSkin.RemoteVersionInfo.MatchGroup = Convert.ToInt32(Console.ReadLine());
             }
-            Console.Write("Local version match file (relative to the skin's folder, 'resource\\menus\\steam.menu' for example): ");
-            newSkin.LocalVersionInfo.MatchURL = Console.ReadLine();
-            Console.Write("Local version match pattern: ");
-            newSkin.LocalVersionInfo.MatchPattern = Console.ReadLine();
-            Console.Write("Local version match group (integer value): ");
-            newSkin.LocalVersionInfo.MatchGroup = Convert.ToInt32(Console.ReadLine());
 
             Console.Write("Add a font? (yes or no) ");
             while ("yes".Equals(Console.ReadLine())) {

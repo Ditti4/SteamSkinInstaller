@@ -16,11 +16,6 @@
       <MatchPattern>&gt;Metro for Steam - (.*)&lt;/a&gt;</MatchPattern>
       <MatchGroup>1</MatchGroup>
     </RemoteVersionInfo>
-    <LocalVersionInfo>
-      <MatchURL>resource\menus\steam.menu</MatchURL>
-      <MatchPattern>text="Metro For Steam - (.*)"</MatchPattern>
-      <MatchGroup>1</MatchGroup>
-    </LocalVersionInfo>
     <ExtraStuff>
       <FontList />
       <FoldersToDeleteOnInstall />
@@ -46,11 +41,6 @@
       <MatchPattern>text="Pressure v(.*)"</MatchPattern>
       <MatchGroup>1</MatchGroup>
     </RemoteVersionInfo>
-    <LocalVersionInfo>
-      <MatchURL>resource\menus\steam.menu</MatchURL>
-      <MatchPattern>text="Pressure v(.*)"</MatchPattern>
-      <MatchGroup>1</MatchGroup>
-    </LocalVersionInfo>
     <ExtraStuff>
       <FontList />
       <FoldersToDeleteOnInstall />

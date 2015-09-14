@@ -39,7 +39,6 @@ namespace SteamSkinInstaller.Skin {
 
         public DownloadInfo FileDownload;
         public VersionInfo RemoteVersionInfo;
-        public VersionInfo LocalVersionInfo;
         public ExtraInfo ExtraStuff;
     }
 }

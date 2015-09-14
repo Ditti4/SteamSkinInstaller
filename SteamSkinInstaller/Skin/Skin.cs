@@ -275,12 +275,7 @@ namespace SteamSkinInstaller.Skin {
 
         public string GetLocalVersion(string installPath) {
             try {
-                if (string.IsNullOrEmpty(Entry.LocalVersionInfo.MatchURL)) {
-                    return File.ReadAllText(Path.Combine(installPath, "skins", Entry.Name, ".version"));
-                }
-                string verisonFileContent = File.ReadAllText(Path.Combine(installPath, "skins", Entry.Name, Entry.LocalVersionInfo.MatchURL));
-                Regex versionRegex = new Regex(Entry.LocalVersionInfo.MatchPattern);
-                return versionRegex.Match(verisonFileContent).Groups[Entry.LocalVersionInfo.MatchGroup].Value;
+                return File.ReadAllText(Path.Combine(installPath, "skins", Entry.Name, ".version"));
             } catch (Exception) {
                 return null;
             }
