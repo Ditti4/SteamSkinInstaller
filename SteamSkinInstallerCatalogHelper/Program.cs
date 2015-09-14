@@ -48,7 +48,7 @@ namespace SteamSkinInstallerCatalogHelper {
                     Console.Write("GitHub repository: ");
                     newSkin.FileDownload.GithubRepo = Console.ReadLine();
                     Console.Write("Does the repository use release tags? (yes or no) ");
-                    newSkin.FileDownload.GithubUseTags = Console.ReadLine().Equals("yes");
+                    newSkin.FileDownload.GithubUseTags = "yes".Equals(Console.ReadLine());
                     break;
                 case "direct":
                     Console.Write("Download URL: ");
@@ -57,12 +57,12 @@ namespace SteamSkinInstallerCatalogHelper {
             }
 
             Console.Write("Create a new folder when unpacking the skin (choose yes if you did not place the skin in a folder before zipping it)? (yes or no) ");
-            newSkin.FileDownload.CreateFolder = Console.ReadLine().Equals("yes");
+            newSkin.FileDownload.CreateFolder = "yes".Equals(Console.ReadLine());
 
             bool remoteVersion = true;
             if (newSkin.FileDownload.Method == "github") {
                 Console.Write("Use different remote version info than GitHub commits/release tags? (yes or no) ");
-                remoteVersion = Console.ReadLine().Equals("yes");
+                remoteVersion = "yes".Equals(Console.ReadLine());
             }
             if (remoteVersion) {
                 Console.Write("Remote version match URL: ");
@@ -72,8 +72,7 @@ namespace SteamSkinInstallerCatalogHelper {
                 Console.Write("Remote version match group (integer value): ");
                 newSkin.RemoteVersionInfo.MatchGroup = Convert.ToInt32(Console.ReadLine());
             }
-            Console.Write(
-                "Local version match file (relative to the skin's folder, 'resource\\menus\\steam.menu' for example): ");
+            Console.Write("Local version match file (relative to the skin's folder, 'resource\\menus\\steam.menu' for example): ");
             newSkin.LocalVersionInfo.MatchURL = Console.ReadLine();
             Console.Write("Local version match pattern: ");
             newSkin.LocalVersionInfo.MatchPattern = Console.ReadLine();
@@ -81,7 +80,7 @@ namespace SteamSkinInstallerCatalogHelper {
             newSkin.LocalVersionInfo.MatchGroup = Convert.ToInt32(Console.ReadLine());
 
             Console.Write("Add a font? (yes or no) ");
-            while (Console.ReadLine().Equals("yes")) {
+            while ("yes".Equals(Console.ReadLine())) {
                 newSkin.ExtraStuff.FontList.Add(new CatalogEntry.ExtraInfo.Font());
                 Console.Write("Font file name (including directory, relative to the skin's folder): ");
                 newSkin.ExtraStuff.FontList.Last().FileName = Console.ReadLine();
@@ -91,28 +90,28 @@ namespace SteamSkinInstallerCatalogHelper {
             }
 
             Console.Write("Delete a file when installing a new skin? (yes or no) ");
-            while (Console.ReadLine().Equals("yes")) {
+            while ("yes".Equals(Console.ReadLine())) {
                 Console.Write("File name (including directory, relative to the skin's folder): ");
                 newSkin.ExtraStuff.FilesToDeleteOnInstall.Add(Console.ReadLine());
                 Console.Write("Add another file to delete? (yes or no) ");
             }
 
             Console.Write("Recursively delete a folder when installing a new skin? (yes or no) ");
-            while (Console.ReadLine().Equals("yes")) {
+            while ("yes".Equals(Console.ReadLine())) {
                 Console.Write("Folder name (relative to the skin's folder): ");
                 newSkin.ExtraStuff.FoldersToDeleteOnInstall.Add(Console.ReadLine());
                 Console.Write("Add another folder to delete? (yes or no) ");
             }
 
             Console.Write("Delete a file when updating an installed skin? (yes or no) ");
-            while (Console.ReadLine().Equals("yes")) {
+            while ("yes".Equals(Console.ReadLine())) {
                 Console.Write("File name (including directory, relative to the skin's folder): ");
                 newSkin.ExtraStuff.FilesToDeleteOnUpdate.Add(Console.ReadLine());
                 Console.Write("Add another file to delete? (yes or no) ");
             }
 
             Console.Write("Recursively delete a folder when updating an installed skin? (yes or no) ");
-            while (Console.ReadLine().Equals("yes")) {
+            while ("yes".Equals(Console.ReadLine())) {
                 Console.Write("Folder name (relative to the skin's folder): ");
                 newSkin.ExtraStuff.FoldersToDeleteOnUpdate.Add(Console.ReadLine());
                 Console.Write("Add another folder to delete? (yes or no) ");
