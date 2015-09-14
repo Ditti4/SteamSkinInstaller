@@ -11,7 +11,6 @@ namespace SteamSkinInstaller.Skin {
     internal class Skin {
         public static string DownloadFolderName = "SSIDownloads";
         public readonly CatalogEntry Entry;
-        public bool SuccessfulInstallation;
         private IDownload _downloadHandler;
         private readonly string _filename;
         private Exception _lastException;
@@ -42,8 +41,7 @@ namespace SteamSkinInstaller.Skin {
                     // TODO
                     break;
                 default:
-                    throw new Exception("Unknown download method " + Entry.FileDownload.Method + " for skin " +
-                                        Entry.Name + ".");
+                    throw new Exception("Unknown download method " + Entry.FileDownload.Method + " for skin " + Entry.Name + ".");
             }
         }
 
@@ -88,6 +86,7 @@ namespace SteamSkinInstaller.Skin {
                     "Error trying to move the skin folder");
                 return 1;
             }
+            File.WriteAllText(Path.Combine(installPath, "skins", Entry.Name, ".version"), GetRemoteVersion());
             FullCleanup();
             return 0;
         }
@@ -140,6 +139,7 @@ namespace SteamSkinInstaller.Skin {
                     "Error trying to move the skin folder");
                 return 1;
             }
+            File.WriteAllText(Path.Combine(installPath, "skins", Entry.Name, ".version"), GetRemoteVersion());
             FullCleanup();
             return 0;
         }
@@ -168,9 +168,7 @@ namespace SteamSkinInstaller.Skin {
                             Directory.Delete(fullname, true);
                         }
                     }
-                    archive.ExtractToDirectory(Entry.FileDownload.CreateFolder
-                        ? Path.Combine(DownloadFolderName, Entry.Name)
-                        : DownloadFolderName);
+                    archive.ExtractToDirectory(Entry.FileDownload.CreateFolder ? Path.Combine(DownloadFolderName, Entry.Name) : DownloadFolderName);
                 }
             } catch (Exception e) {
                 _lastException = e;
@@ -277,7 +275,10 @@ namespace SteamSkinInstaller.Skin {
 
         public string GetLocalVersion(string installPath) {
             try {
-                string verisonFileContent = File.ReadAllText(Path.Combine(installPath, Entry.LocalVersionInfo.MatchURL));
+                if (string.IsNullOrEmpty(Entry.LocalVersionInfo.MatchURL)) {
+                    return File.ReadAllText(Path.Combine(installPath, "skins", Entry.Name, ".version"));
+                }
+                string verisonFileContent = File.ReadAllText(Path.Combine(installPath, "skins", Entry.Name, Entry.LocalVersionInfo.MatchURL));
                 Regex versionRegex = new Regex(Entry.LocalVersionInfo.MatchPattern);
                 return versionRegex.Match(verisonFileContent).Groups[Entry.LocalVersionInfo.MatchGroup].Value;
             } catch (Exception) {

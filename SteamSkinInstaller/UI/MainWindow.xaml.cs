@@ -58,6 +58,7 @@ namespace SteamSkinInstaller.UI {
                         "Caught an exception while trying to handle another unhandled exception. " +
                         "I'm really sorry (this is the point where you may want to panic).", "What the …");
                 }
+                Environment.Exit(1);
             };
 
             InitializeComponent();
@@ -303,12 +304,8 @@ namespace SteamSkinInstaller.UI {
             updateButton.Click += async (sender, args) => {
                 LabelStatus.Content = "Updating " + skin.Entry.Name + ". Please wait …";
                 DisableNetworkControls();
-                await
-                    (Task.Run(
-                        () =>
-                            (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-                                ? skin.Install(_steamClient.GetInstallPath())
-                                : skin.Update(_steamClient.GetInstallPath())));
+                bool forceCleanInstall = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+                await (Task.Run(() => (forceCleanInstall) ? skin.Install(_steamClient.GetInstallPath()) : skin.Update(_steamClient.GetInstallPath())));
                 LabelStatus.Content = "Ready.";
                 EnableNetworkControls();
             };
