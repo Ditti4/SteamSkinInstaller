@@ -13,7 +13,7 @@
     </FileDownload>
     <RemoteVersionInfo>
       <MatchURL>http://boneyardbrew.deviantart.com/art/Metro-for-Steam-292419787</MatchURL>
-      <MatchPattern>&gt;Metro for Steam - (.*)&lt;/a&gt;</MatchPattern>
+      <MatchPattern>&gt;Metro for Steam - ([\d\w\.-]*)&lt;/a&gt;</MatchPattern>
       <MatchGroup>1</MatchGroup>
     </RemoteVersionInfo>
     <ExtraStuff>
