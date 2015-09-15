@@ -70,7 +70,7 @@ namespace SteamSkinInstaller.Steam {
                 ProcessStartInfo quitSteam = new ProcessStartInfo(_exePath, "-shutdown");
                 Process.Start(quitSteam);
                 do {
-                    await Task.Delay(5000);
+                    await Task.Delay(500);
                 } while (Process.GetProcessesByName("Steam").Length > 0);
             }
             ProcessStartInfo startSteam = new ProcessStartInfo(_exePath);
