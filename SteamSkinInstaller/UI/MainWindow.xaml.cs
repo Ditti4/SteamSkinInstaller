@@ -26,6 +26,7 @@ namespace SteamSkinInstaller.UI {
         private bool _online;
         private bool _lockInstallControlsState;
         private bool _lockUpdateControlsState;
+        private bool _lockApplyControlsState;
         private readonly Catalog _availableSkinsCatalog;
         private Catalog _installedSkinsCatalog;
         private List<Skin.Skin> _availableSkins;
@@ -73,6 +74,7 @@ namespace SteamSkinInstaller.UI {
 
             _lockInstallControlsState = false;
             _lockUpdateControlsState = false;
+            _lockApplyControlsState = false;
 
             bool invalidSteamLocation = false;
 
@@ -128,7 +130,7 @@ namespace SteamSkinInstaller.UI {
 
             if (invalidSteamLocation) {
                 StackInstalled.Children.Add(invalidSteamLocationWarning);
-                DisableInstallControls();
+                SetInstallControlsEnabledState(false);
                 _lockInstallControlsState = true;
             } else {
                 RebuildInstalledTab();
@@ -151,7 +153,7 @@ namespace SteamSkinInstaller.UI {
                 _steamClient = newClient;
                 TextSteamLocation.Text = _steamClient.GetInstallPath();
                 _lockInstallControlsState = false;
-                EnableInstallControls();
+                SetInstallControlsEnabledState(true);
 
                 RebuildInstalledTab();
             } catch (Exception exc) {
@@ -170,7 +172,7 @@ namespace SteamSkinInstaller.UI {
                 return;
             }
             LabelStatus.Content = "Downloading newest skin catalog file …";
-            DisableNetworkControls();
+            SetNetworkControlsEnabledState(false);
             //BetterWebClient skinDownloadClient = new BetterWebClient();
             try {
                 // TODO: await skinDownloadClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Ditti4/SteamSkinInstaller/master/SteamSkinInstaller/skins.xml", "skins.xml");
@@ -181,7 +183,7 @@ namespace SteamSkinInstaller.UI {
                     "Something went wrong when trying to get the skin catalog file. Is GitHub offline? Did you delete the internet?",
                     "Error getting skin catalog");
             }
-            EnableNetworkControls();
+            SetNetworkControlsEnabledState(true);
 
             RebuildAvailableTab();
             RemoveInstalledSkinsFromAvailableTab();
@@ -244,14 +246,14 @@ namespace SteamSkinInstaller.UI {
             installButton.Margin = new Thickness(5);
             installButton.Click += async (sender, args) => {
                 LabelStatus.Content = "Installing " + skin.Entry.Name + ". Please wait …";
-                DisableNetworkControls();
+                SetNetworkControlsEnabledState(false);
                 if (await (Task.Run(() => skin.Install(_steamClient.GetInstallPath()))) == 0) {
                     _installedSkins.Add(skin);
                     _installedSkinsCatalog.SaveSkins(_installedSkins);
                     RebuildInstalledTab();
                 }
                 LabelStatus.Content = "Ready.";
-                EnableNetworkControls();
+                SetNetworkControlsEnabledState(true);
             };
             websiteButton.Content = "Visit website";
             websiteButton.Style = (Style) FindResource("KewlButton");
@@ -285,12 +287,13 @@ namespace SteamSkinInstaller.UI {
             DockPanel innerSkinPanel = new DockPanel();
             TextBlock skinDescTextBlock = new TextBlock();
             Button websiteButton = new Button();
+            Button applySkinButton = new Button();
 
             skinNameLabel.Content = skin.Entry.Name;
             skinNameLabel.Padding = new Thickness(0, 10, 0, 0);
             skinNameLabel.FontSize = 20;
 
-            skinAuthorLabel.Content = "by " + skin.Entry.Author;
+            skinAuthorLabel.Content = "by " + skin.Entry.Author + "; installed version: " + (skin.GetLocalVersion(_steamClient.GetInstallPath()) ?? "unknown");;
             skinAuthorLabel.Padding = new Thickness(0);
             outerSkinPanel.Orientation = Orientation.Vertical;
 
@@ -303,13 +306,30 @@ namespace SteamSkinInstaller.UI {
             updateButton.Margin = new Thickness(5);
             updateButton.Click += async (sender, args) => {
                 LabelStatus.Content = "Updating " + skin.Entry.Name + ". Please wait …";
-                DisableNetworkControls();
+                SetNetworkControlsEnabledState(false);
                 bool forceCleanInstall = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
                 await (Task.Run(() => (forceCleanInstall) ? skin.Install(_steamClient.GetInstallPath()) : skin.Update(_steamClient.GetInstallPath())));
                 LabelStatus.Content = "Ready.";
-                EnableNetworkControls();
+                SetNetworkControlsEnabledState(true);
             };
             updateButton.ToolTip = "Shift + Click to perform a clean installation";
+            applySkinButton.Content = "Apply";
+            applySkinButton.Style = (Style) FindResource("KewlButton");
+            applySkinButton.Margin = new Thickness(5);
+            applySkinButton.Click += async (sender, args) => {
+                SetApplyControlsEnabledState(false);
+                LabelStatus.Content = "Setting current Steam skin to " + skin.Entry.Name + " …";
+                _steamClient.SetSkin(skin.Entry.Name);
+                SetApplyControlsEnabledState(true);
+                if (CheckBoxRestartSteam.IsChecked.HasValue && CheckBoxRestartSteam.IsChecked.Value) {
+                    LabelStatus.Content = "Restarting Steam …";
+                    await Task.Run(() => _steamClient.RestartClient());
+                }
+                SetApplyControlsEnabledState(true);
+                LabelStatus.Content = "Done. Enjoy your new skin.";
+                await Task.Delay(2000);
+                LabelStatus.Content = "Ready.";
+            };
             websiteButton.Content = "Visit website";
             websiteButton.Style = (Style) FindResource("KewlButton");
             websiteButton.Margin = new Thickness(5);
@@ -317,6 +337,7 @@ namespace SteamSkinInstaller.UI {
             websiteButton.ToolTip = "Click here to see screenshots and more!";
             buttonPanel.Orientation = Orientation.Vertical;
 
+            buttonPanel.Children.Add(applySkinButton);
             buttonPanel.Children.Add(updateButton);
             buttonPanel.Children.Add(websiteButton);
 
@@ -400,7 +421,7 @@ namespace SteamSkinInstaller.UI {
         }
 
         private async void SetOnlineStatus() {
-            DisableNetworkControls();
+            SetNetworkControlsEnabledState(false);
             LabelStatus.Content = "Checking internet connection, please wait …";
             if (!await Task.Run(() => MiscTools.IsComputerOnline())) {
                 LabelStatus.Content = "Computer is not online. All online functionality will be disabled.";
@@ -410,10 +431,10 @@ namespace SteamSkinInstaller.UI {
                 _online = true;
             }
             LabelStatus.Content = "Ready.";
-            EnableNetworkControls();
+            SetNetworkControlsEnabledState(true);
         }
 
-        private void SetInstallControlsState(bool state) {
+        private void SetInstallControlsEnabledState(bool state) {
             if (_lockInstallControlsState) {
                 return;
             }
@@ -426,8 +447,7 @@ namespace SteamSkinInstaller.UI {
                         foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
                             if (mightBeButtonPanel is StackPanel) {
                                 foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeButtonPanel).Children) {
-                                    if (mightBeInstallButton is Button &&
-                                        (string) ((Button) mightBeInstallButton).Content == "Install") {
+                                    if (mightBeInstallButton is Button && (string) ((Button) mightBeInstallButton).Content == "Install") {
                                         mightBeInstallButton.IsEnabled = state;
                                     }
                                 }
@@ -438,10 +458,8 @@ namespace SteamSkinInstaller.UI {
             }
         }
 
-        private void SetUpdateControlsState(bool state) {
-            if (_lockUpdateControlsState) {
-                return;
-            }
+
+        private void SetInstalledTabControlsEnabledState(string buttonText, bool state) {
             if (StackInstalled.Children.Count == 0 || !(StackInstalled.Children[0] is StackPanel)) {
                 return;
             }
@@ -450,10 +468,9 @@ namespace SteamSkinInstaller.UI {
                     if (mightBeInnerPanel is DockPanel) {
                         foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
                             if (mightBeButtonPanel is StackPanel) {
-                                foreach (UIElement mightBeUpdateButton in ((StackPanel) mightBeButtonPanel).Children) {
-                                    if (mightBeUpdateButton is Button &&
-                                        (string) ((Button) mightBeUpdateButton).Content == "Update") {
-                                        mightBeUpdateButton.IsEnabled = state;
+                                foreach (UIElement mightBeRelevantButton in ((StackPanel) mightBeButtonPanel).Children) {
+                                    if (mightBeRelevantButton is Button && (string) ((Button) mightBeRelevantButton).Content == buttonText) {
+                                        mightBeRelevantButton.IsEnabled = state;
                                     }
                                 }
                             }
@@ -462,35 +479,24 @@ namespace SteamSkinInstaller.UI {
                 }
             }
         }
-
-        private void EnableInstallControls() {
-            SetInstallControlsState(true);
+        private void SetApplyControlsEnabledState(bool state) {
+            if (_lockApplyControlsState) {
+                return;
+            }
+            SetInstalledTabControlsEnabledState("Apply", state);
         }
 
-        private void DisableInstallControls() {
-            SetInstallControlsState(false);
+        private void SetUpdateControlsEnabledState(bool state) {
+            if (_lockUpdateControlsState) {
+                return;
+            }
+            SetInstalledTabControlsEnabledState("Update", state);
         }
 
-        private void EnableUpdateControls() {
-            SetUpdateControlsState(true);
-        }
-
-        private void DisableUpdateControls() {
-            SetUpdateControlsState(false);
-        }
-
-        private void SetNetworkControlsState(bool state) {
-            SetInstallControlsState(state);
-            SetUpdateControlsState(state);
+        private void SetNetworkControlsEnabledState(bool state) {
+            SetInstallControlsEnabledState(state);
+            SetUpdateControlsEnabledState(state);
             ButtonRefresh.IsEnabled = state;
-        }
-
-        private void EnableNetworkControls() {
-            SetNetworkControlsState(true);
-        }
-
-        private void DisableNetworkControls() {
-            SetNetworkControlsState(false);
         }
     }
 }
