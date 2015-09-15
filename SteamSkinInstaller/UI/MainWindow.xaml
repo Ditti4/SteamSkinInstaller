@@ -1,12 +1,12 @@
 ﻿<Window x:Class="SteamSkinInstaller.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Steam Skin Installer" Height="350" Width="525" Icon="icon.ico">
+        Title="Steam Skin Installer" Height="380" Width="525" Icon="icon.ico">
     <Window.Resources>
         <ResourceDictionary Source="KewlResources.xaml"/>
     </Window.Resources>
     <Grid>
-        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,10,0,24" Background="{x:Null}" BorderThickness="0" SelectionChanged="TabControl_SelectionChanged">
+        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,10,1,24" Background="{x:Null}" BorderThickness="0" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Name="TabAvailable" Header="AVAILABLE" Background="{x:Null}" Style="{DynamicResource KewlTabItem}">
                 <Grid ShowGridLines="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
