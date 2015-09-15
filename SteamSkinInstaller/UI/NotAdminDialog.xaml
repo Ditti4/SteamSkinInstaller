@@ -11,7 +11,7 @@
         </TextBlock>
         <TextBlock HorizontalAlignment="Stretch" Margin="20,79,10,0" TextWrapping="Wrap" VerticalAlignment="Top">
             1. Install skin's required fonts using the experimental, not-yet-implemented method<LineBreak/>
-            2. Change the skin using the installer
+            2. Unknown functionality which might be added in the future
         </TextBlock>
         <TextBlock HorizontalAlignment="Stretch" Margin="10,127,10,0" TextWrapping="Wrap" VerticalAlignment="Top">
             If you don't care about any of that, just click "Continue as normal user". If you want to use any of the above features, then please restart Steam Skin Installer in elevated mode using the left button.

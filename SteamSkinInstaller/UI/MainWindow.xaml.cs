@@ -68,9 +68,8 @@ namespace SteamSkinInstaller.UI {
             Top = (SystemParameters.PrimaryScreenHeight/2) - (Height/2);
             InfoIcon.Source = Imaging.CreateBitmapSourceFromHIcon(SystemIcons.Information.Handle, Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions());
-            if (IsAdmin()) {
-                ButtonUnelevated.Visibility = Visibility.Hidden;
-            }
+
+            ButtonUnelevated.Visibility = Visibility.Hidden;
 
             _lockInstallControlsState = false;
             _lockUpdateControlsState = false;
