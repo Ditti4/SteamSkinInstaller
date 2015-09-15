@@ -452,15 +452,7 @@ namespace SteamSkinInstaller.UI {
                 return;
             }
             foreach (DockPanel skin in StackAvailable.Children) {
-                foreach (UIElement mightBeRightPanel in skin.Children) {
-                    if (mightBeRightPanel is StackPanel) {
-                        foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeRightPanel).Children) {
-                            if (mightBeInstallButton is Button && (string) ((Button) mightBeInstallButton).Content == "Install") {
-                                mightBeInstallButton.IsEnabled = state;
-                            }
-                        }
-                    }
-                }
+                ((Button) ((StackPanel) skin.Children[0]).Children[0]).IsEnabled = state;
             }
         }
 
@@ -470,14 +462,10 @@ namespace SteamSkinInstaller.UI {
                 return;
             }
             foreach (DockPanel skin in StackInstalled.Children) {
-                foreach (UIElement mightBeRightPanel in skin.Children) {
-                    if (mightBeRightPanel is StackPanel) {
-                        foreach (UIElement mightBeDesiredButton in ((StackPanel) mightBeRightPanel).Children) {
-                            if (mightBeDesiredButton is Button && (string) ((Button) mightBeDesiredButton).Content == buttonText) {
-                                mightBeDesiredButton.IsEnabled = state;
-                            }
-                        }
-                    }
+                if (buttonText == "Apply") {
+                    ((Button) ((StackPanel) skin.Children[0]).Children[0]).IsEnabled = state;
+                } else {
+                    ((Button) ((StackPanel) skin.Children[0]).Children[1]).IsEnabled = state;
                 }
             }
         }
