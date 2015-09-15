@@ -136,6 +136,8 @@ namespace SteamSkinInstaller.UI {
             }
 
             SetOnlineStatus();
+
+            CheckBoxRestartSteam.IsChecked = Properties.Settings.Default.RestartSteam;
         }
 
         private void ButtonSteamLocation_Click(object sender, RoutedEventArgs e) {
@@ -496,6 +498,16 @@ namespace SteamSkinInstaller.UI {
             SetInstallControlsEnabledState(state);
             SetUpdateControlsEnabledState(state);
             ButtonRefresh.IsEnabled = state;
+        }
+
+        private void ButtonReset_Click(object sender, RoutedEventArgs e) {
+            Properties.Settings.Default.Reset();
+            CheckBoxRestartSteam.IsChecked = Properties.Settings.Default.RestartSteam;
+        }
+
+        private void CheckBoxRestartSteam_CheckedChanged(object sender, RoutedEventArgs e) {
+            Properties.Settings.Default.RestartSteam = CheckBoxRestartSteam.IsChecked.HasValue && CheckBoxRestartSteam.IsChecked.Value;
+            Properties.Settings.Default.Save();
         }
     }
 }
