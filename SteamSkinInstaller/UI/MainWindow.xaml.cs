@@ -220,15 +220,15 @@ namespace SteamSkinInstaller.UI {
             }
         }
 
-        private StackPanel GetNewAvailableSkinFragment(Skin.Skin skin) {
-            StackPanel outerSkinPanel = new StackPanel();
+        private DockPanel GetNewAvailableSkinFragment(Skin.Skin skin) {
             Label skinNameLabel = new Label();
             Label skinAuthorLabel = new Label();
-            StackPanel buttonPanel = new StackPanel();
-            Button installButton = new Button();
-            DockPanel innerSkinPanel = new DockPanel();
             TextBlock skinDescTextBlock = new TextBlock();
+            Button installButton = new Button();
             Button websiteButton = new Button();
+            StackPanel leftPanel = new StackPanel();
+            StackPanel rightPanel = new StackPanel();
+            DockPanel skinFragment = new DockPanel();
 
             skinNameLabel.Content = skin.Entry.Name;
             skinNameLabel.Padding = new Thickness(0, 10, 0, 0);
@@ -236,7 +236,6 @@ namespace SteamSkinInstaller.UI {
 
             skinAuthorLabel.Content = "by " + skin.Entry.Author;
             skinAuthorLabel.Padding = new Thickness(0);
-            outerSkinPanel.Orientation = Orientation.Vertical;
 
             skinDescTextBlock.Text = skin.Entry.Description;
             skinDescTextBlock.TextWrapping = TextWrapping.Wrap;
@@ -261,46 +260,67 @@ namespace SteamSkinInstaller.UI {
             websiteButton.Margin = new Thickness(5);
             websiteButton.Click += (sender, args) => { Process.Start(skin.Entry.Website); };
             websiteButton.ToolTip = "Click here to see screenshots and more!";
-            buttonPanel.Orientation = Orientation.Vertical;
 
-            buttonPanel.Children.Add(installButton);
-            buttonPanel.Children.Add(websiteButton);
+            leftPanel.Children.Add(skinNameLabel);
+            leftPanel.Children.Add(skinAuthorLabel);
+            leftPanel.Children.Add(skinDescTextBlock);
 
-            DockPanel.SetDock(skinDescTextBlock, Dock.Left);
-            DockPanel.SetDock(buttonPanel, Dock.Right);
+            rightPanel.Margin = new Thickness(0, 15, 0, 0);
+            rightPanel.Children.Add(installButton);
+            rightPanel.Children.Add(websiteButton);
 
-            innerSkinPanel.Children.Add(buttonPanel);
-            innerSkinPanel.Children.Add(skinDescTextBlock);
+            DockPanel.SetDock(leftPanel, Dock.Left);
+            DockPanel.SetDock(rightPanel, Dock.Right);
 
-            outerSkinPanel.Children.Add(skinNameLabel);
-            outerSkinPanel.Children.Add(skinAuthorLabel);
-            outerSkinPanel.Children.Add(innerSkinPanel);
+            skinFragment.Margin = new Thickness(0, 5, 0, 5);
+            skinFragment.Children.Add(rightPanel);
+            skinFragment.Children.Add(leftPanel);
 
-            return outerSkinPanel;
+            return skinFragment;
         }
 
-        private StackPanel GetNewInstalledSkinFragment(Skin.Skin skin) {
-            StackPanel outerSkinPanel = new StackPanel();
+        private DockPanel GetNewInstalledSkinFragment(Skin.Skin skin) {
             Label skinNameLabel = new Label();
             Label skinAuthorLabel = new Label();
-            StackPanel buttonPanel = new StackPanel();
-            Button updateButton = new Button();
-            DockPanel innerSkinPanel = new DockPanel();
             TextBlock skinDescTextBlock = new TextBlock();
+            Button applyButton = new Button();
+            Button updateButton = new Button();
             Button websiteButton = new Button();
-            Button applySkinButton = new Button();
+            StackPanel leftPanel = new StackPanel();
+            StackPanel rightPanel = new StackPanel();
+            DockPanel skinFragment = new DockPanel();
 
             skinNameLabel.Content = skin.Entry.Name;
             skinNameLabel.Padding = new Thickness(0, 10, 0, 0);
             skinNameLabel.FontSize = 20;
 
-            skinAuthorLabel.Content = "by " + skin.Entry.Author + "; installed version: " + (skin.GetLocalVersion(_steamClient.GetInstallPath()) ?? "unknown");;
+            skinAuthorLabel.Content = "by " + skin.Entry.Author + "; installed version: " + (skin.GetLocalVersion(_steamClient.GetInstallPath()) ?? "unknown");
             skinAuthorLabel.Padding = new Thickness(0);
-            outerSkinPanel.Orientation = Orientation.Vertical;
 
             skinDescTextBlock.Text = skin.Entry.Description;
             skinDescTextBlock.TextWrapping = TextWrapping.Wrap;
             skinDescTextBlock.Margin = new Thickness(10);
+
+            applyButton.Content = "Apply";
+            applyButton.Style = (Style) FindResource("KewlButton");
+            applyButton.Margin = new Thickness(5);
+            applyButton.Click += async (sender, args) => {
+                SetApplyControlsEnabledState(false);
+                LabelStatus.Content = "Setting current Steam skin to " + skin.Entry.Name + " …";
+                _steamClient.SetSkin(skin.Entry.Name);
+                SetApplyControlsEnabledState(true);
+                if (Properties.Settings.Default.RestartSteam) {
+                    LabelStatus.Content = "Restarting Steam …";
+                    await Task.Run(() => _steamClient.RestartClient());
+                }
+                SetApplyControlsEnabledState(true);
+                LabelStatus.Content = "Done. Enjoy your new skin.";
+                if (Properties.Settings.Default.RestartSteam) {
+                    LabelStatus.Content += " Hint: Steam might still be busy restarting, so be patient.";
+                }
+                await Task.Delay(3000);
+                LabelStatus.Content = "Ready.";
+            };
 
             updateButton.Content = "Update";
             updateButton.Style = (Style) FindResource("KewlButton");
@@ -314,48 +334,37 @@ namespace SteamSkinInstaller.UI {
                 SetNetworkControlsEnabledState(true);
             };
             updateButton.ToolTip = "Shift + Click to perform a clean installation";
-            applySkinButton.Content = "Apply";
-            applySkinButton.Style = (Style) FindResource("KewlButton");
-            applySkinButton.Margin = new Thickness(5);
-            applySkinButton.Click += async (sender, args) => {
-                SetApplyControlsEnabledState(false);
-                LabelStatus.Content = "Setting current Steam skin to " + skin.Entry.Name + " …";
-                _steamClient.SetSkin(skin.Entry.Name);
-                SetApplyControlsEnabledState(true);
-                if (CheckBoxRestartSteam.IsChecked.HasValue && CheckBoxRestartSteam.IsChecked.Value) {
-                    LabelStatus.Content = "Restarting Steam …";
-                    await Task.Run(() => _steamClient.RestartClient());
-                }
-                SetApplyControlsEnabledState(true);
-                LabelStatus.Content = "Done. Enjoy your new skin.";
-                await Task.Delay(2000);
-                LabelStatus.Content = "Ready.";
-            };
+
             websiteButton.Content = "Visit website";
             websiteButton.Style = (Style) FindResource("KewlButton");
             websiteButton.Margin = new Thickness(5);
             websiteButton.Click += (sender, args) => { Process.Start(skin.Entry.Website); };
             websiteButton.ToolTip = "Click here to see screenshots and more!";
-            buttonPanel.Orientation = Orientation.Vertical;
 
-            buttonPanel.Children.Add(applySkinButton);
-            buttonPanel.Children.Add(updateButton);
-            buttonPanel.Children.Add(websiteButton);
+            leftPanel.Children.Add(skinNameLabel);
+            leftPanel.Children.Add(skinAuthorLabel);
+            leftPanel.Children.Add(skinDescTextBlock);
 
-            DockPanel.SetDock(skinDescTextBlock, Dock.Left);
-            DockPanel.SetDock(buttonPanel, Dock.Right);
+            rightPanel.Margin = new Thickness(0, 15, 0, 0);
+            rightPanel.Children.Add(applyButton);
+            rightPanel.Children.Add(updateButton);
+            rightPanel.Children.Add(websiteButton);
 
-            innerSkinPanel.Children.Add(buttonPanel);
-            innerSkinPanel.Children.Add(skinDescTextBlock);
+            DockPanel.SetDock(leftPanel, Dock.Left);
+            DockPanel.SetDock(rightPanel, Dock.Right);
 
-            outerSkinPanel.Children.Add(skinNameLabel);
-            outerSkinPanel.Children.Add(skinAuthorLabel);
-            outerSkinPanel.Children.Add(innerSkinPanel);
+            skinFragment.Margin = new Thickness(0, 5, 0, 5);
+            skinFragment.Children.Add(rightPanel);
+            skinFragment.Children.Add(leftPanel);
 
-            return outerSkinPanel;
+            return skinFragment;
         }
 
         private void RebuildAvailableTab() {
+            for (int i = StackAvailable.Children.Count - 1; i >= 0; i--) {
+                StackAvailable.Children.RemoveAt(i);
+            }
+
             int returncode;
 
             _availableSkins = _availableSkinsCatalog.GetSkins(out returncode);
@@ -407,11 +416,11 @@ namespace SteamSkinInstaller.UI {
         }
 
         private void RemoveInstalledSkinsFromAvailableTab() {
-            if (!(StackAvailable.Children[0] is StackPanel)) {
+            if (!(StackAvailable.Children[0] is DockPanel)) {
                 return;
             }
             for (int i = StackAvailable.Children.Count - 1; i >= 0; i--) {
-                Label skinNameLabel = (Label) ((StackPanel) StackAvailable.Children[i]).Children[0];
+                Label skinNameLabel = (Label) ((StackPanel) ((DockPanel) StackAvailable.Children[i]).Children[1]).Children[0];
                 if (_installedSkins.Any(skin => skin.Entry.Name == (string) skinNameLabel.Content)) {
                     StackAvailable.Children.RemoveAt(i);
                 }
@@ -439,19 +448,15 @@ namespace SteamSkinInstaller.UI {
             if (_lockInstallControlsState) {
                 return;
             }
-            if (StackAvailable.Children.Count == 0 || !(StackAvailable.Children[0] is StackPanel)) {
+            if (StackAvailable.Children.Count == 0 || !(StackAvailable.Children[0] is DockPanel)) {
                 return;
             }
-            foreach (StackPanel skin in StackAvailable.Children) {
-                foreach (UIElement mightBeInnerPanel in skin.Children) {
-                    if (mightBeInnerPanel is DockPanel) {
-                        foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
-                            if (mightBeButtonPanel is StackPanel) {
-                                foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeButtonPanel).Children) {
-                                    if (mightBeInstallButton is Button && (string) ((Button) mightBeInstallButton).Content == "Install") {
-                                        mightBeInstallButton.IsEnabled = state;
-                                    }
-                                }
+            foreach (DockPanel skin in StackAvailable.Children) {
+                foreach (UIElement mightBeRightPanel in skin.Children) {
+                    if (mightBeRightPanel is StackPanel) {
+                        foreach (UIElement mightBeInstallButton in ((StackPanel) mightBeRightPanel).Children) {
+                            if (mightBeInstallButton is Button && (string) ((Button) mightBeInstallButton).Content == "Install") {
+                                mightBeInstallButton.IsEnabled = state;
                             }
                         }
                     }
@@ -461,19 +466,15 @@ namespace SteamSkinInstaller.UI {
 
 
         private void SetInstalledTabControlsEnabledState(string buttonText, bool state) {
-            if (StackInstalled.Children.Count == 0 || !(StackInstalled.Children[0] is StackPanel)) {
+            if (StackInstalled.Children.Count == 0 || !(StackInstalled.Children[0] is DockPanel)) {
                 return;
             }
-            foreach (StackPanel skin in StackInstalled.Children) {
-                foreach (UIElement mightBeInnerPanel in skin.Children) {
-                    if (mightBeInnerPanel is DockPanel) {
-                        foreach (UIElement mightBeButtonPanel in ((DockPanel) mightBeInnerPanel).Children) {
-                            if (mightBeButtonPanel is StackPanel) {
-                                foreach (UIElement mightBeRelevantButton in ((StackPanel) mightBeButtonPanel).Children) {
-                                    if (mightBeRelevantButton is Button && (string) ((Button) mightBeRelevantButton).Content == buttonText) {
-                                        mightBeRelevantButton.IsEnabled = state;
-                                    }
-                                }
+            foreach (DockPanel skin in StackInstalled.Children) {
+                foreach (UIElement mightBeRightPanel in skin.Children) {
+                    if (mightBeRightPanel is StackPanel) {
+                        foreach (UIElement mightBeDesiredButton in ((StackPanel) mightBeRightPanel).Children) {
+                            if (mightBeDesiredButton is Button && (string) ((Button) mightBeDesiredButton).Content == buttonText) {
+                                mightBeDesiredButton.IsEnabled = state;
                             }
                         }
                     }
