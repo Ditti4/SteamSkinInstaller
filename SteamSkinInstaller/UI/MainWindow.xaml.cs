@@ -330,6 +330,7 @@ namespace SteamSkinInstaller.UI {
                 SetNetworkControlsEnabledState(false);
                 bool forceCleanInstall = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
                 await (Task.Run(() => (forceCleanInstall) ? skin.Install(_steamClient.GetInstallPath()) : skin.Update(_steamClient.GetInstallPath())));
+                RebuildInstalledTab();
                 LabelStatus.Content = "Ready.";
                 SetNetworkControlsEnabledState(true);
             };
