@@ -105,7 +105,7 @@ namespace SteamSkinInstaller.UI {
             _errorReadingInstalledCatalogWarning = new TextBlock {
                 Text =
                     "Error while trying to read the skin catalog file. Try deleting it (located in " +
-                    Path.Combine(_steamClient.GetInstallPath(), "skins", "skins.xml") + ") and hope for the best.",
+                    Path.Combine((invalidSteamLocation) ? "your Steam install location" : (_steamClient.GetInstallPath()), "skins", "skins.xml") + ") and hope for the best.",
                 Margin = new Thickness(10),
                 TextWrapping = TextWrapping.WrapWithOverflow
             };
