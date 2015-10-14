@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Text.RegularExpressions;
 using System.Windows;
 using SteamSkinInstaller.DownloadHandler;
 

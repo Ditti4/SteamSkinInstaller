@@ -64,8 +64,6 @@ namespace SteamSkinInstaller.UI {
 
             InitializeComponent();
 
-            Left = (SystemParameters.PrimaryScreenWidth/2) - (Width/2);
-            Top = (SystemParameters.PrimaryScreenHeight/2) - (Height/2);
             InfoIcon.Source = Imaging.CreateBitmapSourceFromHIcon(SystemIcons.Information.Handle, Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions());
 

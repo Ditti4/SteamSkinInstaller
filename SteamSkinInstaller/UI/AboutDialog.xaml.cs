@@ -10,18 +10,15 @@ namespace SteamSkinInstaller.UI {
     /// </summary>
     public partial class AboutDialog {
         private string _codename = "Knorke";
-        private string[] _developers = {
+        private readonly string[] _developers = {
             "Rico \"Ditti4\" Dittrich",
         };
 
         public AboutDialog() {
             InitializeComponent();
 
-            Left = (SystemParameters.PrimaryScreenWidth / 2) - (Width / 2);
-            Top = (SystemParameters.PrimaryScreenHeight / 2) - (Height / 2);
-
-            string version = Assembly.GetExecutingAssembly().GetName().Version.Major.ToString() + "." +
-                             Assembly.GetExecutingAssembly().GetName().Version.Minor.ToString() + " \"" + _codename + "\"";
+            string version = Assembly.GetExecutingAssembly().GetName().Version.Major + "." +
+                             Assembly.GetExecutingAssembly().GetName().Version.Minor + " \"" + _codename + "\"";
 
             TextVersion.Text = TextVersion.Text.Replace("%versionplaceholder%", version);
 
