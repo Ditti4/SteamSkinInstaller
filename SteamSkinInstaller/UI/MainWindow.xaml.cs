@@ -9,8 +9,10 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SteamSkinInstaller.Skin;
 using SteamSkinInstaller.Steam;
@@ -36,6 +38,8 @@ namespace SteamSkinInstaller.UI {
         private readonly TextBlock _errorReadingCatalogWarning;
         private readonly TextBlock _errorReadingInstalledCatalogWarning;
         private readonly TextBlock _allSkinsInstalled;
+
+        private bool _hasInstalledSkin = false;
 
         public static bool IsAdmin() {
             _principal = _principal ?? new WindowsPrincipal(WindowsIdentity.GetCurrent() ?? new WindowsIdentity(""));
@@ -275,6 +279,143 @@ namespace SteamSkinInstaller.UI {
             skinFragment.Children.Add(leftPanel);
 
             return skinFragment;
+        }
+
+        private void AddSkinListEntry(Skin.Skin skin) {
+            ListBoxItem root = new ListBoxItem();
+            DockPanel entryPanel = new DockPanel();
+            Label skinNameLabel = new Label();
+            Label skinLastUpdateLabel = new Label();
+            Label isInstalledLabel = new Label();
+
+            root.Style = (Style)FindResource("KewlListBoxItem");
+
+            entryPanel.VerticalAlignment = VerticalAlignment.Stretch;
+
+            skinNameLabel.FontSize = 16;
+            skinNameLabel.Margin = new Thickness(10, 10, 10, 0);
+            skinNameLabel.Padding = new Thickness(0);
+            skinNameLabel.Content = skin.Entry.Name;
+
+            DockPanel.SetDock(skinNameLabel, Dock.Top);
+
+            skinLastUpdateLabel.Margin = new Thickness(10, 0, 10, 10);
+            skinLastUpdateLabel.Padding = new Thickness(0);
+            skinLastUpdateLabel.Content = "Last updated: Jan 05, 2015";
+
+            DockPanel.SetDock(skinLastUpdateLabel, Dock.Bottom);
+
+            isInstalledLabel.FontSize = 24;
+            isInstalledLabel.VerticalAlignment = VerticalAlignment.Center;
+            isInstalledLabel.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#808080");
+            isInstalledLabel.Visibility = _hasInstalledSkin ? Visibility.Hidden : Visibility.Visible;
+            isInstalledLabel.Content = "✓";
+
+            DockPanel.SetDock(isInstalledLabel, Dock.Right);
+
+            entryPanel.Children.Add(isInstalledLabel);
+            entryPanel.Children.Add(skinNameLabel);
+            entryPanel.Children.Add(skinLastUpdateLabel);
+
+            root.Content = entryPanel;
+            root.IsSelected = !_hasInstalledSkin;
+
+            // TODO: add some logic to this dummy variable
+            _hasInstalledSkin = true;
+
+            // TODO: comment in the next line after adjusting the main layout
+            //SkinList.Items.Add(root);
+        }
+
+        private void GenerateDetailsGridForSkin(Skin.Skin skin) {
+            StackPanel root = new StackPanel();
+            System.Windows.Controls.Image previewImage = new System.Windows.Controls.Image();
+            Label skinNameLabel = new Label();
+            Label skinAuthorLabel = new Label();
+            TextBlock skinDescriptionBlock = new TextBlock();
+            StackPanel buttonPanel = new StackPanel();
+            Button installButton = new Button();
+            Button websiteButton = new Button();
+            StackPanel changelogPanel = new StackPanel();
+            StackPanel changelogEntry = new StackPanel();
+            Label changelogLabel = new Label();
+            TextBlock changelogBlock = new TextBlock();
+
+            root.VerticalAlignment = VerticalAlignment.Stretch;
+            root.Orientation = Orientation.Vertical;
+
+            // TODO: display a real and correct preview image here
+            previewImage.Source = new BitmapImage(new Uri("dummy.png", UriKind.Relative));
+            previewImage.Margin = new Thickness(0);
+            previewImage.VerticalAlignment = VerticalAlignment.Top;
+            previewImage.MaxHeight = 500;
+
+            skinNameLabel.FontSize = 18;
+            skinNameLabel.FontWeight = FontWeights.Bold;
+            skinNameLabel.Margin = new Thickness(5, 5, 0, 0);
+            skinNameLabel.Padding = new Thickness(2);
+            skinNameLabel.Content = skin.Entry.Name;
+
+            skinAuthorLabel.FontSize = 14;
+            skinAuthorLabel.Foreground = (SolidColorBrush)(new BrushConverter().ConvertFrom("#808080"));
+            skinAuthorLabel.Margin = new Thickness(10, 0, 0, 0);
+            skinAuthorLabel.Padding = new Thickness(2);
+            skinAuthorLabel.Content = skin.Entry.Author;
+
+            skinDescriptionBlock.Margin = new Thickness(7, 5, 7, 5);
+            skinDescriptionBlock.VerticalAlignment = VerticalAlignment.Stretch;
+            skinDescriptionBlock.TextWrapping = TextWrapping.Wrap;
+            skinDescriptionBlock.Text = skin.Entry.Description;
+
+            buttonPanel.VerticalAlignment = VerticalAlignment.Stretch;
+            buttonPanel.Orientation = Orientation.Horizontal;
+            buttonPanel.Margin = new Thickness(10, 0, 0, 0);
+
+            installButton.Style = (Style)FindResource("KewlButton");
+            installButton.Content = "INSTALL";
+            installButton.Click += (sender, args) => MessageBox.Show("Nope.");
+
+            websiteButton.Style = (Style)FindResource("KewlButton");
+            websiteButton.Content = "WEBSITE";
+            websiteButton.Click += (sender, args) => Process.Start(skin.Entry.Website);
+
+            // TODO: actually get a changelog from whatever source and display it here
+            /*
+            changelogPanel.VerticalAlignment = VerticalAlignment.Stretch;
+            changelogPanel.Orientation = Orientation.Vertical;
+
+            changelogEntry.VerticalAlignment = VerticalAlignment.Stretch;
+            changelogEntry.Orientation = Orientation.Vertical;
+            changelogEntry.Margin = new Thickness(10);
+
+            changelogLabel.FontSize = 20;
+            changelogLabel.Content = "1.1.0 (Jan 05, 2015)";
+
+            changelogBlock.Padding = new Thickness(2);
+            changelogBlock.Text = "* Just another relase, no changes\n* Need to fill some more space here …";
+            */
+
+            buttonPanel.Children.Add(installButton);
+            buttonPanel.Children.Add(websiteButton);
+
+            changelogEntry.Children.Add(changelogLabel);
+            changelogEntry.Children.Add(changelogBlock);
+
+            changelogPanel.Children.Add(changelogEntry);
+
+            root.Children.Add(previewImage);
+            root.Children.Add(skinNameLabel);
+            root.Children.Add(skinAuthorLabel);
+            root.Children.Add(skinDescriptionBlock);
+            root.Children.Add(buttonPanel);
+            root.Children.Add(changelogPanel);
+
+            // TODO: add root to the skin object so it can be set active later on
+
+            /*
+            SkinDetailsGrid.Children.Clear();
+            SkinDetailsGrid.Children.Add(root);
+            */
         }
 
         private DockPanel GetNewInstalledSkinFragment(Skin.Skin skin) {
