@@ -4,12 +4,16 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Windows;
+using System.Windows.Controls;
 using SteamSkinInstaller.DownloadHandler;
+using SteamSkinInstaller.UI;
 
 namespace SteamSkinInstaller.Skin {
     internal class Skin {
         public static string DownloadFolderName = "SSIDownloads";
         public readonly CatalogEntry Entry;
+        public Grid DetailsGrid;
+        public StatusBar StatusBar;
         private IDownload _downloadHandler;
         private readonly string _filename;
         private Exception _lastException;
@@ -36,9 +40,9 @@ namespace SteamSkinInstaller.Skin {
                         Entry.RemoteVersionInfo.MatchGroup, Entry.RemoteVersionInfo.MatchURL,
                         Entry.FileDownload.FolderName ?? Entry.Name);
                     break;
-                case "direct":
+                //case "direct":
                     // TODO
-                    break;
+                    //break;
                 default:
                     throw new Exception("Unknown download method " + Entry.FileDownload.Method + " for skin " + Entry.Name + ".");
             }
