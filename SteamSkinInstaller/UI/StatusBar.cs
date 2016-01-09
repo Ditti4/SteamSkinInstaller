@@ -20,6 +20,11 @@ namespace SteamSkinInstaller.UI {
             set { _statusProgress.Width = (int)(value * 2.5); }
         }
 
+        public bool Visible {
+            get { return _root.Visibility == Visibility.Visible; }
+            set { _root.Visibility = value ? Visibility.Visible : Visibility.Hidden; }
+        }
+
         public StatusBar() {
             BrushConverter brushConverter = new BrushConverter();
             Thickness progressThickness = new Thickness(25, 15, 25, 15);
@@ -32,6 +37,7 @@ namespace SteamSkinInstaller.UI {
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Margin = new Thickness(20),
                 Background = (SolidColorBrush)brushConverter.ConvertFrom("#212121"),
+                Visibility = Visibility.Hidden,
                 Effect = new DropShadowEffect {
                     BlurRadius = 20,
                     ShadowDepth = 1
@@ -76,7 +82,7 @@ namespace SteamSkinInstaller.UI {
             return _root;
         }
 
-        public static implicit operator UIElement(StatusBar statusBar) {
+        public static implicit operator DockPanel(StatusBar statusBar) {
             return statusBar.ToDockPanel();
         }
     }
