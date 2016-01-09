@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="About"
-        Height="360" Width="336"
+        Height="258.151" Width="336"
         ResizeMode="NoResize"
         Icon="icon.ico"
         WindowStartupLocation="CenterOwner">
@@ -17,10 +17,6 @@
             A project written by Ditti4 to support the laziness of Steam users.<LineBreak/>
             This is an open-source project. The full source code can be found in the <Hyperlink NavigateUri="http://github.com/Ditti4/SteamSkinInstaller" RequestNavigate="Hyperlink_OnRequestNavigate">GitHub repository</Hyperlink>.
         </TextBlock>
-        <TextBlock Margin="10,127,10,0" HorizontalAlignment="Stretch" TextWrapping="Wrap" VerticalAlignment="Top">
-            A huge shoutout goes to Stackoverflow and their awesome community who was there if the MSDN didn't have a too-good documentation on any function.<LineBreak/>
-            A much bigger thank you, however, goes to everyone who helped to fix and extend this project:
-        </TextBlock>
-        <TextBox Name="BoxDevelopers" HorizontalAlignment="Stretch" Margin="10,212,10,10" TextWrapping="Wrap" IsReadOnly="True" VerticalAlignment="Stretch" TextAlignment="Center"/>
+        <TextBlock Margin="10,127,10,0" HorizontalAlignment="Stretch" TextWrapping="Wrap" VerticalAlignment="Top"><Run Text="A huge shoutout goes to Stackoverflow and their awesome community who was there if the MSDN didn't have a too-good documentation on any function."/><LineBreak/><Run Text="A much bigger thank you, however, goes to everyone who helped to fix and extend this project."/></TextBlock>
     </Grid>
 </Window>
