@@ -25,6 +25,11 @@ namespace SteamSkinInstaller.UI {
             set { _root.Visibility = value ? Visibility.Visible : Visibility.Hidden; }
         }
 
+        public bool ProgressVisible {
+            get { return _statusProgress.Visibility == Visibility.Visible; }
+            set { _statusProgress.Visibility = value ? Visibility.Visible : Visibility.Hidden; }
+        }
+
         public StatusBar() {
             BrushConverter brushConverter = new BrushConverter();
             Thickness progressThickness = new Thickness(25, 15, 25, 15);
@@ -36,7 +41,7 @@ namespace SteamSkinInstaller.UI {
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Margin = new Thickness(20),
-                Background = (SolidColorBrush)brushConverter.ConvertFrom("#212121"),
+                Background = (SolidColorBrush) brushConverter.ConvertFrom("#212121"),
                 Visibility = Visibility.Hidden,
                 Effect = new DropShadowEffect {
                     BlurRadius = 20,
@@ -46,14 +51,14 @@ namespace SteamSkinInstaller.UI {
 
             _statusText = new TextBlock {
                 TextWrapping = TextWrapping.Wrap,
-                Foreground = (SolidColorBrush)brushConverter.ConvertFrom("#FFFFFF"),
+                Foreground = (SolidColorBrush) brushConverter.ConvertFrom("#FFFFFF"),
                 Margin = new Thickness(20, 15, 20, 15)
             };
 
             Rectangle progressBackground = new Rectangle {
                 Height = 5,
                 Width = 250,
-                Fill = (SolidColorBrush)brushConverter.ConvertFrom("#FFFFFF"),
+                Fill = (SolidColorBrush) brushConverter.ConvertFrom("#FFFFFF"),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Margin = progressThickness
@@ -62,7 +67,7 @@ namespace SteamSkinInstaller.UI {
             _statusProgress = new Rectangle {
                 Height = 5,
                 Width = 0,
-                Fill = (SolidColorBrush)brushConverter.ConvertFrom("#FB8C00"),
+                Fill = (SolidColorBrush) brushConverter.ConvertFrom("#FB8C00"),
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Margin = progressThickness
