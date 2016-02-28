@@ -2,51 +2,30 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Steam Skin Installer"
-        Height="380" Width="525"
-        MinHeight="380" MinWidth="525"
+        Height="700" Width="1000"
+        FontFamily="Segoe UI"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="CanMinimize"
+        BorderThickness="1" BorderBrush="#212121"
         Icon="icon.ico"
         WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <ResourceDictionary Source="KewlResources.xaml"/>
-    </Window.Resources>
     <Grid>
-        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,10,1,24" Background="{x:Null}" BorderThickness="0" SelectionChanged="TabControl_SelectionChanged">
-            <TabItem Name="TabAvailable" Header="AVAILABLE" Background="{x:Null}" Style="{DynamicResource KewlTabItem}">
-                <Grid ShowGridLines="True">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Name="StackAvailable"/>
-                    </ScrollViewer>
-                </Grid>
-            </TabItem>
-            <TabItem Name="TabInstalled" Header="INSTALLED" Background="{x:Null}" Style="{DynamicResource KewlTabItem}">
-                <Grid ShowGridLines="True">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <StackPanel Name="StackInstalled"/>
-                    </ScrollViewer>
-                </Grid>
-            </TabItem>
-            <TabItem Name="TabSettings" Header="SETTINGS" Background="{x:Null}" Style="{DynamicResource KewlTabItem}">
-                <Grid>
-                    <Button Name="ButtonSteamLocation" Content = "Browse…" HorizontalAlignment="Right" Margin="15" VerticalAlignment="Top" Click="ButtonSteamLocation_Click" Style="{DynamicResource KewlButton}"/>
-                    <TextBox Name="TextSteamLocation" HorizontalAlignment="Stretch" Height="23" Margin="150,15,120,0" TextWrapping="Wrap" VerticalAlignment="Top" Style="{DynamicResource KewlTextbox}" IsReadOnly="True"/>
-                    <Label Content="Steam install location" HorizontalAlignment="Left" Margin="10,14,0,0" VerticalAlignment="Top" Width="125"/>
-                    <Button Name="ButtonReset" Content="Reset" HorizontalAlignment="Right" Margin="15" VerticalAlignment="Bottom" Style="{DynamicResource KewlButton}" Click="ButtonReset_Click"/>
-                    <CheckBox Name="CheckBoxRestartSteam" Content="Restart Steam after applying a new skin" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Checked="CheckBoxRestartSteam_CheckedChanged" Unchecked="CheckBoxRestartSteam_CheckedChanged"/>
-                    <Button Name="ButtonAbout" Content="About …" HorizontalAlignment="Left" Margin="10,0,0,15" VerticalAlignment="Bottom" Style="{DynamicResource KewlButton}" Click="ButtonAbout_Click"/>
-                    <Button Name="ButtonUnelevated" HorizontalAlignment="Left" Margin="115,0,0,15" VerticalAlignment="Bottom" Style="{DynamicResource KewlButton}" Width="135" Click="ButtonUnelevated_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Height="16" Width="16" Name="InfoIcon" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                            <TextBlock Margin="1,0">
-                                Running unelevated
-                            </TextBlock>
-                        </StackPanel>
-                    </Button>
-                </Grid>
-            </TabItem>
-        </TabControl>
-        <Button Name="ButtonRefresh" Content="Refresh list" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Style="{DynamicResource KewlButton}" Click="ButtonRefresh_Click"/>
-        <StatusBar HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="24" Padding="0">
-            <Label Name="LabelStatus" HorizontalAlignment="Stretch" Padding="0"/>
-        </StatusBar>
+        <DockPanel LastChildFill="True">
+            <DockPanel Name="Titlebar" DockPanel.Dock="Top" Height="30" HorizontalAlignment="Stretch" Background="#212121" MouseDown="Titlebar_MouseDown">
+                <Image Name="TitlebarIcon"/>
+                <Label HorizontalAlignment="Stretch" Foreground="White" DockPanel.Dock="Left">Steam Skin Installer</Label>
+                <Button HorizontalAlignment="Right" Margin="0" DockPanel.Dock="Right" Style="{DynamicResource KewlTitlebarButton}" ToolTip="Close" FontFamily="Webdings" Click="CloseButton_Click">r</Button>
+                <Button HorizontalAlignment="Right" Margin="0" DockPanel.Dock="Right" Style="{DynamicResource KewlTitlebarButton}" ToolTip="Minimize" Click="MinimizeButton_Click">___</Button>
+                <Button HorizontalAlignment="Right" Margin="0" DockPanel.Dock="Right" Style="{DynamicResource KewlTitlebarButton}" ToolTip="About Steam Skin Installer" Click="ButtonAbout_Click">?</Button>
+                <Button HorizontalAlignment="Right" Margin="0" DockPanel.Dock="Right" Style="{DynamicResource KewlTitlebarButton}" ToolTip="Settings">&#9881;</Button>
+                <Button HorizontalAlignment="Right" Margin="0" DockPanel.Dock="Right" Style="{DynamicResource KewlTitlebarButton}" ToolTip="Refresh skin list" Name="RefreshButton" Click="ButtonRefresh_Click">&#10227;</Button>
+            </DockPanel>
+            <ListBox Name="SkinList" DockPanel.Dock="Left" Style="{DynamicResource KewlListBox}" SelectionChanged="SkinList_SelectionChanged"/>
+            <ScrollViewer VerticalScrollBarVisibility="Hidden" DockPanel.Dock="Right">
+                <Grid Name="SkinDetailsGrid"/>
+            </ScrollViewer>
+        </DockPanel>
+        <Grid Name="StatusBarGrid"/>
     </Grid>
 </Window>

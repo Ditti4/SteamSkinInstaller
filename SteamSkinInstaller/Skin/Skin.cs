@@ -8,11 +8,13 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SteamSkinInstaller.DownloadHandler;
+using SteamSkinInstaller.Steam;
 using SteamSkinInstaller.UI;
 
 namespace SteamSkinInstaller.Skin {
     internal class Skin {
         public static string DownloadFolderName = "SSIDownloads";
+
         public readonly CatalogEntry Entry;
         public StackPanel DetailsPanel;
         public StatusBar StatusBar;
@@ -22,9 +24,20 @@ namespace SteamSkinInstaller.Skin {
         private readonly string _filename;
         private Exception _lastException;
 
-        // FIXME: dummy variable, remove later
-        private bool _hasInstalledSkin;
+        private Label _isInstalledLabel;
+        private Button _installButton;
+        private Button _updateButton;
+        private Button _applyButton;
 
+        public bool Installed {
+            get { return _isInstalledLabel.Visibility == Visibility.Visible; }
+            set {
+                _isInstalledLabel.Visibility = value ? Visibility.Visible : Visibility.Hidden;
+                _installButton.Visibility = !value ? Visibility.Visible : Visibility.Collapsed;
+                _updateButton.Visibility = !value ? Visibility.Visible : Visibility.Collapsed;
+                _applyButton.IsEnabled = value;
+            }
+        }
         public Skin(CatalogEntry entry) {
             Entry = entry;
             _filename = Path.Combine(DownloadFolderName, Entry.Name + ".zip");
@@ -59,7 +72,9 @@ namespace SteamSkinInstaller.Skin {
             }
         }
 
-        public int Install(string installPath) {
+        public int Install() {
+            ClientProperties steamClient = ClientProperties.GetInstance();
+            string installPath = (steamClient == null) ? null : steamClient.GetInstallPath();
             switch (Download()) {
                 case 1:
                     MessageBox.Show(
@@ -105,7 +120,9 @@ namespace SteamSkinInstaller.Skin {
             return 0;
         }
 
-        public int Update(string installPath) {
+        public int Update() {
+            ClientProperties steamClient = ClientProperties.GetInstance();
+            string installPath = (steamClient == null) ? null : steamClient.GetInstallPath();
             switch (Download()) {
                 case 1:
                     MessageBox.Show(
@@ -304,7 +321,9 @@ namespace SteamSkinInstaller.Skin {
             Label skinAuthorLabel = new Label();
             TextBlock skinDescriptionBlock = new TextBlock();
             StackPanel buttonPanel = new StackPanel();
-            Button installButton = new Button();
+            _installButton = new Button();
+            _updateButton = new Button();
+            _applyButton = new Button();
             Button websiteButton = new Button();
             StackPanel changelogPanel = new StackPanel();
             StackPanel changelogEntry = new StackPanel();
@@ -341,9 +360,25 @@ namespace SteamSkinInstaller.Skin {
             buttonPanel.Orientation = Orientation.Horizontal;
             buttonPanel.Margin = new Thickness(10, 0, 0, 0);
 
-            installButton.Style = (Style) Application.Current.FindResource("KewlButton");
-            installButton.Content = "INSTALL";
-            installButton.Click += (sender, args) => Install(null);
+            _installButton.Style = (Style) Application.Current.FindResource("KewlButton");
+            _installButton.Content = "INSTALL";
+            _installButton.Click += (sender, args) => Install();
+
+            _updateButton.Style = (Style) Application.Current.FindResource("KewlButton");
+            _updateButton.Content = "UPDATE";
+            _updateButton.Visibility = Visibility.Collapsed;
+            _updateButton.Click += (sender, args) => Update();
+
+            _applyButton.Style = (Style) Application.Current.FindResource("KewlButton");
+            _applyButton.Content = "APPLY";
+            _applyButton.IsEnabled = false;
+            _applyButton.Click += (sender, args) => {
+                ClientProperties steamClient = ClientProperties.GetInstance();
+                if (steamClient == null) {
+                    return;
+                }
+                steamClient.SetSkin(Entry.Name);
+            };
 
             websiteButton.Style = (Style) Application.Current.FindResource("KewlButton");
             websiteButton.Content = "WEBSITE";
@@ -365,7 +400,9 @@ namespace SteamSkinInstaller.Skin {
             changelogBlock.Text = "* Just another relase, no changes\n* Need to fill some more space here …";
             */
 
-            buttonPanel.Children.Add(installButton);
+            buttonPanel.Children.Add(_installButton);
+            buttonPanel.Children.Add(_updateButton);
+            buttonPanel.Children.Add(_applyButton);
             buttonPanel.Children.Add(websiteButton);
 
             changelogEntry.Children.Add(changelogLabel);
@@ -386,7 +423,7 @@ namespace SteamSkinInstaller.Skin {
             DockPanel entryPanel = new DockPanel();
             Label skinNameLabel = new Label();
             Label skinLastUpdateLabel = new Label();
-            Label isInstalledLabel = new Label();
+            _isInstalledLabel = new Label();
 
             ListEntry.Style = (Style) Application.Current.FindResource("KewlListBoxItem");
 
@@ -405,23 +442,19 @@ namespace SteamSkinInstaller.Skin {
 
             DockPanel.SetDock(skinLastUpdateLabel, Dock.Bottom);
 
-            isInstalledLabel.FontSize = 24;
-            isInstalledLabel.VerticalAlignment = VerticalAlignment.Center;
-            isInstalledLabel.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#808080");
-            isInstalledLabel.Visibility = _hasInstalledSkin ? Visibility.Hidden : Visibility.Visible;
-            isInstalledLabel.Content = "✓";
+            _isInstalledLabel.FontSize = 24;
+            _isInstalledLabel.VerticalAlignment = VerticalAlignment.Center;
+            _isInstalledLabel.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#808080");
+            _isInstalledLabel.Visibility = Visibility.Hidden;
+            _isInstalledLabel.Content = "✓";
 
-            DockPanel.SetDock(isInstalledLabel, Dock.Right);
+            DockPanel.SetDock(_isInstalledLabel, Dock.Right);
 
-            entryPanel.Children.Add(isInstalledLabel);
+            entryPanel.Children.Add(_isInstalledLabel);
             entryPanel.Children.Add(skinNameLabel);
             entryPanel.Children.Add(skinLastUpdateLabel);
 
             ListEntry.Content = entryPanel;
-            ListEntry.IsSelected = !_hasInstalledSkin;
-
-            // TODO: add some logic to this dummy variable
-            _hasInstalledSkin = true;
 
             // TODO: comment in the next line after adjusting the main layout
             //SkinList.Items.Add(root);
