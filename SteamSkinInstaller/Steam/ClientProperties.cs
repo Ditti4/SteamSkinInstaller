@@ -10,12 +10,9 @@ namespace SteamSkinInstaller.Steam {
         private string _installPath;
         private string _exePath;
         private string _skin;
-        private bool _beta;
 
         public string InstallPath {
-            get {
-                return _installPath;
-            }
+            get { return _installPath; }
             set {
                 // null value can be used to reset the installation path to the registry value
                 if (string.IsNullOrEmpty(value)) {
@@ -36,14 +33,24 @@ namespace SteamSkinInstaller.Steam {
                     _exePath = null;
                     throw new Exception("Invalid Steam installation path.");
                 }
-                if (File.Exists(Path.Combine(_installPath, "package", "beta"))) {
-                    _beta = true;
-                }
             }
         }
 
         public string ExePath {
             get { return _exePath; }
+        }
+
+        public bool Beta {
+            get { return File.Exists(Path.Combine(_installPath, "package", "beta")); }
+            set {
+                if (value) {
+                    File.WriteAllText(Path.Combine(_installPath, "package", "beta"), "publicbeta");
+                } else {
+                    if (File.Exists(Path.Combine(_installPath, "package", "beta"))) {
+                        File.Delete(Path.Combine(_installPath, "package", "beta"));
+                    }
+                }
+            }
         }
 
         private ClientProperties() {
@@ -61,22 +68,6 @@ namespace SteamSkinInstaller.Steam {
 
         public string GetInstallPath() {
             return _installPath;
-        }
-
-        public bool IsBetaClient() {
-            return _beta;
-        }
-
-        public void UnsubscribeFromBeta() {
-            if (File.Exists(Path.Combine(_installPath, "package", "beta"))) {
-                File.Delete(Path.Combine(_installPath, "package", "beta"));
-                _beta = false;
-            }
-        }
-
-        public void SubscribeToBeta() {
-            File.WriteAllText(Path.Combine(_installPath, "package", "beta"), "publicbeta");
-            _beta = true;
         }
 
         public async void RestartClient() {
